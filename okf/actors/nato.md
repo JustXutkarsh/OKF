@@ -1,10 +1,13 @@
 ---
+schema_version: 1
 id: nato
 type: concept
 title: NATO
-tags: [actor, alliance, europe, security]
 resource: actors
+tags: [actor, alliance, europe, security]
+created_at: 2026-08-06
 last_updated: 2026-08-06
+confidence: verified
 related: [ukraine-russia-frontline]
 ---
 
@@ -27,7 +30,19 @@ NATO's 2026 materials describe continued adaptation of deterrence and defense, i
 
 ## Sources
 
-- https://www.nato.int/en/about-us/official-texts-and-resources/official-texts/2026/07/08/the-ankara-summit-declaration - NATO 2026 Ankara Summit Declaration.
-- https://nato.int/en/what-we-do/partnerships-and-cooperation/natos-support-for-ukraine - NATO topic page on support for Ukraine.
-- https://www.nato.int/en/what-we-do/deterrence-and-defence/deterrence-and-defence - NATO topic page on deterrence and defense.
-- https://nato.int/en/about-us/organization/nato-member-countries - NATO member countries page.
+- title: NATO Ankara Summit Declaration
+  url: https://www.nato.int/en/about-us/official-texts-and-resources/official-texts/2026/07/08/the-ankara-summit-declaration
+  accessed: 2026-08-06
+  note: Official 2026 summit declaration including Ukraine support commitments.
+- title: NATO support for Ukraine
+  url: https://nato.int/en/what-we-do/partnerships-and-cooperation/natos-support-for-ukraine
+  accessed: 2026-08-06
+  note: NATO topic page describing support for Ukraine.
+- title: NATO deterrence and defense
+  url: https://www.nato.int/en/what-we-do/deterrence-and-defence/deterrence-and-defence
+  accessed: 2026-08-06
+  note: NATO topic page on deterrence and defense posture.
+- title: NATO member countries
+  url: https://nato.int/en/about-us/organization/nato-member-countries
+  accessed: 2026-08-06
+  note: Official list of NATO member countries.

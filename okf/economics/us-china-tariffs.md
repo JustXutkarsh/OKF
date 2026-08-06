@@ -1,10 +1,13 @@
 ---
+schema_version: 1
 id: us-china-tariffs
 type: concept
 title: US-China Tariffs
-tags: [economics, us-china, trade, tariffs]
 resource: economics
+tags: [economics, us-china, trade, tariffs]
+created_at: 2026-08-06
 last_updated: 2026-08-06
+confidence: verified
 related: [us-export-controls-semiconductors]
 ---
 
@@ -27,7 +30,19 @@ USTR materials show the China Section 301 framework is still active, with exclus
 
 ## Sources
 
-- https://ustr.gov/trade-topics/enforcement/section-301-investigations/tariff-actions - USTR hub for China Section 301 tariff actions and exclusion process.
-- https://ustr.gov/trade-topics/enforcement/section-301-investigations/section-301-china-technology-transfer/china-section-301-tariff-actions-and-exclusion-process/four-year-review - USTR four-year review page for China Section 301 actions.
-- https://ustr.gov/about/policy-offices/press-office/press-releases/2026/march/ustr-initiates-section-301-investigations-relating-structural-excess-capacity-and-production - USTR 2026 Section 301 investigations on structural excess capacity and production.
-- https://ustr.gov/about/policy-offices/press-office/press-releases/2026/june/ustr-makes-findings-and-proposes-action-60-section-301-investigations-relating-failures-take-action - USTR proposed action on forced-labor-related Section 301 investigations.
+- title: USTR China Section 301 tariff actions
+  url: https://ustr.gov/trade-topics/enforcement/section-301-investigations/tariff-actions
+  accessed: 2026-08-06
+  note: USTR hub for China Section 301 tariff actions and exclusion process.
+- title: USTR China Section 301 four-year review
+  url: https://ustr.gov/trade-topics/enforcement/section-301-investigations/section-301-china-technology-transfer/china-section-301-tariff-actions-and-exclusion-process/four-year-review
+  accessed: 2026-08-06
+  note: USTR page for the four-year review of China Section 301 actions.
+- title: USTR structural excess capacity investigation
+  url: https://ustr.gov/about/policy-offices/press-office/press-releases/2026/march/ustr-initiates-section-301-investigations-relating-structural-excess-capacity-and-production
+  accessed: 2026-08-06
+  note: Announces 2026 Section 301 investigations on structural excess capacity and production.
+- title: USTR forced-labor-related proposed action
+  url: https://ustr.gov/about/policy-offices/press-office/press-releases/2026/june/ustr-makes-findings-and-proposes-action-60-section-301-investigations-relating-failures-take-action
+  accessed: 2026-08-06
+  note: Describes proposed action on forced-labor-related Section 301 investigations.

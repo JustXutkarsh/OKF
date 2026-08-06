@@ -1,10 +1,13 @@
 ---
+schema_version: 1
 id: us-export-controls-semiconductors
 type: concept
 title: US Semiconductor Export Controls
-tags: [policy, us-china, semiconductors, export-controls]
 resource: policy
+tags: [policy, us-china, semiconductors, export-controls]
+created_at: 2026-08-06
 last_updated: 2026-08-06
+confidence: verified
 related: [us-china-tariffs]
 ---
 
@@ -27,6 +30,15 @@ BIS materials show that the control regime has expanded from the 2022 advanced c
 
 ## Sources
 
-- https://www.bis.gov/press-release/commerce-implements-new-export-controls-advanced-computing-semiconductor-manufacturing-items-peoples - BIS 2022 announcement on advanced computing and semiconductor manufacturing controls.
-- https://www.bis.gov/press-release/commerce-strengthens-export-controls-restrict-chinas-capability-produce-advanced-semiconductors-military - BIS 2024 package expanding controls on equipment, software, HBM, and Entity List entries.
-- https://www.bis.gov/press-release/department-commerce-closes-export-controls-loophole-foreign-owned-semiconductor-fabs-china - BIS 2025 action ending license-free treatment for certain foreign-owned semiconductor fabs in China.
+- title: BIS advanced computing and semiconductor manufacturing controls
+  url: https://www.bis.gov/press-release/commerce-implements-new-export-controls-advanced-computing-semiconductor-manufacturing-items-peoples
+  accessed: 2026-08-06
+  note: Announces advanced computing and semiconductor manufacturing export controls.
+- title: BIS strengthened semiconductor export controls
+  url: https://www.bis.gov/press-release/commerce-strengthens-export-controls-restrict-chinas-capability-produce-advanced-semiconductors-military
+  accessed: 2026-08-06
+  note: Expands controls on equipment, software, HBM, and Entity List entries.
+- title: BIS foreign-owned semiconductor fab controls
+  url: https://www.bis.gov/press-release/department-commerce-closes-export-controls-loophole-foreign-owned-semiconductor-fabs-china
+  accessed: 2026-08-06
+  note: Ends license-free treatment for certain foreign-owned semiconductor fabs in China.

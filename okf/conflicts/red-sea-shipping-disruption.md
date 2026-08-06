@@ -1,11 +1,14 @@
 ---
+schema_version: 1
 id: red-sea-shipping-disruption
 type: concept
 title: Red Sea Shipping Disruption
-tags: [conflict, maritime-security, trade, middle-east]
 resource: conflicts
+tags: [conflict, maritime-security, trade, middle-east]
+created_at: 2026-08-06
 last_updated: 2026-08-06
-related: []
+confidence: verified
+related: [us-china-tariffs]
 ---
 
 ## Summary
@@ -27,6 +30,15 @@ Recent reporting indicates renewed maritime risk around the Red Sea, Gulf of Ade
 
 ## Sources
 
-- https://www.imo.org/en/mediacentre/hottopics/pages/red-sea.aspx - IMO Red Sea area page tracking conflict-related attacks and safety concerns.
-- https://www.imo.org/en/mediacentre/pressbriefings/pages/imo-msc-resolution-red-sea.aspx - IMO Maritime Safety Committee resolution condemning attacks on Red Sea shipping.
-- https://www.theguardian.com/world/live/2026/aug/06/iran-oman-strait-of-hormuz-yemen-houthis-israel-lebanon-gaza-us-donald-trump-middle-east-crisis-live-news - Live regional reporting on shipping and Middle East crisis developments.
+- title: IMO Red Sea area update
+  url: https://www.imo.org/en/mediacentre/hottopics/pages/red-sea.aspx
+  accessed: 2026-08-06
+  note: Tracks conflict-related attacks and safety concerns affecting Red Sea shipping.
+- title: IMO Maritime Safety Committee Red Sea resolution
+  url: https://www.imo.org/en/mediacentre/pressbriefings/pages/imo-msc-resolution-red-sea.aspx
+  accessed: 2026-08-06
+  note: Condemns attacks on Red Sea shipping and frames them as a threat to navigation.
+- title: Guardian Middle East crisis live coverage
+  url: https://www.theguardian.com/world/live/2026/aug/06/iran-oman-strait-of-hormuz-yemen-houthis-israel-lebanon-gaza-us-donald-trump-middle-east-crisis-live-news
+  accessed: 2026-08-06
+  note: Regional reporting on shipping and Middle East crisis developments.

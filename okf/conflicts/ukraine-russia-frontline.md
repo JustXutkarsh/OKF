@@ -1,10 +1,13 @@
 ---
+schema_version: 1
 id: ukraine-russia-frontline
 type: concept
 title: Ukraine-Russia Frontline
-tags: [conflict, ukraine, russia, europe]
 resource: conflicts
+tags: [conflict, ukraine, russia, europe]
+created_at: 2026-08-06
 last_updated: 2026-08-06
+confidence: verified
 related: [nato]
 ---
 
@@ -27,6 +30,15 @@ Recent reporting describes Russia seeking momentum while Ukrainian forces contin
 
 ## Sources
 
-- https://apnews.com/article/30447169b0145caa2e48ebf22b235c7a - AP report on Ukrainian strikes against Russian oil facilities and Russian attacks on Ukraine.
-- https://apnews.com/article/eb62397d10bca2d6db4269a3bcfc9dc6 - AP report on Russian missile and drone attacks on Kyiv and Ukraine's air-defense needs.
-- https://www.wsj.com/world/russia/putin-overhauls-war-effort-in-ukraine-as-russia-seeks-momentum-61cfb9b1 - Reporting on Russian war effort changes and battlefield momentum.
+- title: AP report on Ukraine strikes and Russian attacks
+  url: https://apnews.com/article/30447169b0145caa2e48ebf22b235c7a
+  accessed: 2026-08-06
+  note: Covers Ukrainian strikes against Russian oil facilities and Russian attacks on Ukraine.
+- title: AP report on Russian air attacks
+  url: https://apnews.com/article/eb62397d10bca2d6db4269a3bcfc9dc6
+  accessed: 2026-08-06
+  note: Covers Russian missile and drone attacks on Kyiv and Ukraine's air-defense needs.
+- title: Wall Street Journal report on Russian war effort
+  url: https://www.wsj.com/world/russia/putin-overhauls-war-effort-in-ukraine-as-russia-seeks-momentum-61cfb9b1
+  accessed: 2026-08-06
+  note: Discusses Russian war effort changes and battlefield momentum.
