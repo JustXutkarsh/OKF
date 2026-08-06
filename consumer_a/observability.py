@@ -1,0 +1,54 @@
+"""Structured, secret-free logging for Consumer A (own module).
+
+Mirrors the producer's convention but shares no code with it. Logs go to
+stderr as `event key=value ...`. Never logs API keys, bundle contents,
+LLM prompts, or the full user question (hashed for correlation only).
+"""
+
+from __future__ import annotations
+
+import logging
+import sys
+import time
+
+logger = logging.getLogger("consumer_a")
+
+
+def configure_logging(level: str = "INFO") -> None:
+    """Configure the consumer_a logger (UTC timestamps, stderr)."""
+
+    handler = logging.StreamHandler(sys.stderr)
+    formatter = logging.Formatter(
+        "%(asctime)sZ %(levelname)s %(name)s %(message)s", "%Y-%m-%dT%H:%M:%S"
+    )
+    formatter.converter = time.gmtime
+    handler.setFormatter(formatter)
+    logger.handlers[:] = [handler]
+    logger.setLevel(getattr(logging, level.upper(), logging.INFO))
+    logger.propagate = False
+
+
+def log_event(event: str, **fields: object) -> None:
+    """Emit one structured log line: `event key=value ...`."""
+
+    suffix = " ".join(f"{key}={value}" for key, value in fields.items())
+    logger.info("%s %s", event, suffix)
+
+
+class StageTimer:
+    """Measure one pipeline stage; elapsed time in milliseconds."""
+
+    def __init__(self) -> None:
+        self.duration_ms = 0
+        self._start = 0.0
+
+    def __enter__(self) -> StageTimer:
+        self._start = time.perf_counter()
+        return self
+
+    def __exit__(self, *exc_info: object) -> bool:
+        self.duration_ms = self.elapsed_ms()
+        return False
+
+    def elapsed_ms(self) -> int:
+        return round((time.perf_counter() - self._start) * 1000)
