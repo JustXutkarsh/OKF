@@ -10,7 +10,6 @@ from pathlib import Path
 from validator.cli import main
 from validator.validator import validate_bundle
 
-
 VALID_DOC = """---
 schema_version: okf-geopolitics/v1
 id: nato
@@ -46,18 +45,23 @@ Initial seed.
   note: Example source.
 """
 
-RELATED_DOC = VALID_DOC.replace(
-    "id: nato",
-    "id: ukraine-russia-frontline",
-).replace(
-    "title: NATO",
-    "title: Ukraine-Russia Frontline",
-).replace(
-    "resource: actors",
-    "resource: conflicts",
-).replace(
-    "related: [ukraine-russia-frontline]",
-    "related: [nato]",
+RELATED_DOC = (
+    VALID_DOC.replace(
+        "id: nato",
+        "id: ukraine-russia-frontline",
+    )
+    .replace(
+        "title: NATO",
+        "title: Ukraine-Russia Frontline",
+    )
+    .replace(
+        "resource: actors",
+        "resource: conflicts",
+    )
+    .replace(
+        "related: [ukraine-russia-frontline]",
+        "related: [nato]",
+    )
 )
 
 

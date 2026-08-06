@@ -75,10 +75,11 @@ Earlier entry.
   note: AP coverage.
 """
 
-UKRAINE_DOC = NATO_DOC.replace("id: nato", "id: ukraine-russia-frontline").replace(
-    "title: NATO", "title: Ukraine-Russia Frontline"
-).replace("resource: actors", "resource: conflicts").replace(
-    "related: [ukraine-russia-frontline]", "related: [nato]"
+UKRAINE_DOC = (
+    NATO_DOC.replace("id: nato", "id: ukraine-russia-frontline")
+    .replace("title: NATO", "title: Ukraine-Russia Frontline")
+    .replace("resource: actors", "resource: conflicts")
+    .replace("related: [ukraine-russia-frontline]", "related: [nato]")
 )
 
 REGISTRY_YAML = """
@@ -236,7 +237,9 @@ class UpdateFlowTests(unittest.TestCase):
         self.assertIn("Update applied", report)
         doc = load_document(text)
         self.assertEqual(doc.summary, DRAFT.summary)
-        self.assertEqual([e.date for e in doc.developments], ["2026-08-07", "2026-08-06", "2026-08-01"])
+        self.assertEqual(
+            [e.date for e in doc.developments], ["2026-08-07", "2026-08-06", "2026-08-01"]
+        )
         self.assertEqual(doc.developments[0].text, DRAFT.development)
         self.assertEqual(doc.developments[1].text, "Allies met in Brussels.")
         self.assertEqual(doc.developments[2].text, "Earlier entry.")
@@ -430,9 +433,7 @@ class FailureRollbackTests(unittest.TestCase):
         """An LLM contract failure aborts the pipeline without writing."""
 
         with two_doc_project() as config:
-            summarizer = FakeSummarizer(
-                error=LLMResponseError("Malformed LLM response: not JSON")
-            )
+            summarizer = FakeSummarizer(error=LLMResponseError("Malformed LLM response: not JSON"))
             with self.assertRaises(LLMResponseError):
                 run(
                     "nato",
@@ -524,7 +525,12 @@ class ContractTests(unittest.TestCase):
     def test_unknown_concept(self) -> None:
         with two_doc_project() as config:
             with self.assertRaises(RegistryError):
-                run("ghost-concept", config=config, search_client=FakeSearch([]), summarizer=FakeSummarizer())
+                run(
+                    "ghost-concept",
+                    config=config,
+                    search_client=FakeSearch([]),
+                    summarizer=FakeSummarizer(),
+                )
 
     def test_missing_tavily_key(self) -> None:
         with two_doc_project() as config:
@@ -636,7 +642,8 @@ class ConfigurationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             dotenv = Path(tmp) / ".env"
             dotenv.write_text(
-                "OKF_PRODUCER_MODEL=llama-3.3-70b-versatile  # producer model\nTAVILY_API_KEY=abc#not-a-comment\n",
+                "OKF_PRODUCER_MODEL=llama-3.3-70b-versatile  # producer model\n"
+                "TAVILY_API_KEY=abc#not-a-comment\n",
                 encoding="utf-8",
             )
             config = load_config(env={}, dotenv_path=dotenv)
@@ -689,11 +696,7 @@ class ExitCodeTests(unittest.TestCase):
         failure = ValidationFailure(
             ValidationResult(
                 checked=1,
-                errors=[
-                    ValidationError(
-                        code="OKF007", file="x.md", rule="r", suggested_fix="f"
-                    )
-                ],
+                errors=[ValidationError(code="OKF007", file="x.md", rule="r", suggested_fix="f")],
             )
         )
         self.assertEqual(exit_code_for(failure), 5)

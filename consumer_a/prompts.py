@@ -28,7 +28,7 @@ SYSTEM_PROMPT = (
     "- No markdown, no headings, no code fences, no YAML, no links in any value.\n"
     "- If the documents conflict, state the conflict explicitly in "
     "current_situation.\n"
-    '- If the documents cannot answer the question, respond with exactly: '
+    "- If the documents cannot answer the question, respond with exactly: "
     '{"current_situation": "' + NOT_COVERED_SENTENCE + '", '
     '"key_developments": [], "key_actors": [], "reasoning": ""}'
 )

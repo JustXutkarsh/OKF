@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import re
 from collections import Counter
+from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from validator.models import ParsedDocument, ValidationError
 
@@ -306,9 +307,7 @@ def validate_related_ids(documents: list[ParsedDocument]) -> list[ValidationErro
     """Ensure every related id exists in the bundle."""
 
     known_ids = {
-        doc.frontmatter.get("id")
-        for doc in documents
-        if isinstance(doc.frontmatter.get("id"), str)
+        doc.frontmatter.get("id") for doc in documents if isinstance(doc.frontmatter.get("id"), str)
     }
     errors: list[ValidationError] = []
     for document in documents:
@@ -350,7 +349,9 @@ def _section_content_lines(document: ParsedDocument, section: str) -> list[tuple
 
     start = document.section_lines[section] + 1
     next_headers = [
-        line_no for name, line_no in document.section_lines.items() if line_no > start and name != section
+        line_no
+        for name, line_no in document.section_lines.items()
+        if line_no > start and name != section
     ]
     end = min(next_headers) if next_headers else len(document.lines) + 1
     return [(line_no, document.lines[line_no - 1]) for line_no in range(start, end)]
@@ -364,7 +365,10 @@ def _source_entries(lines: list[tuple[int, str]]) -> list[dict[str, Any]]:
     for line_no, text in lines:
         stripped = text.strip()
         if stripped.startswith("- title:"):
-            current = {"line": line_no, "fields": {"title": stripped.removeprefix("- title:").strip()}}
+            current = {
+                "line": line_no,
+                "fields": {"title": stripped.removeprefix("- title:").strip()},
+            }
             entries.append(current)
             continue
         if current is None or not text.startswith("  "):

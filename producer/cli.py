@@ -189,9 +189,7 @@ def run(
     total.__enter__()
 
     def complete(outcome: str, report: str) -> str:
-        log_event(
-            "run.complete", concept=concept_id, outcome=outcome, total_ms=total.elapsed_ms()
-        )
+        log_event("run.complete", concept=concept_id, outcome=outcome, total_ms=total.elapsed_ms())
         return report
 
     existing: Document | None = None
@@ -207,13 +205,18 @@ def run(
     with StageTimer() as stage:
         raw_results = search_client.search(spec.search_query, days, limit)
     log_event(
-        "stage", concept=concept_id, stage="search",
-        duration_ms=stage.duration_ms, results=len(raw_results),
+        "stage",
+        concept=concept_id,
+        stage="search",
+        duration_ms=stage.duration_ms,
+        results=len(raw_results),
     )
 
     evidence = build_evidence(raw_results, limit)
     if not evidence:
-        return complete("noop", f"• {concept_id}: no evidence in the last {days} day(s); no changes.")
+        return complete(
+            "noop", f"• {concept_id}: no evidence in the last {days} day(s); no changes."
+        )
 
     summarizer = summarizer or Summarizer(config)
     latest = existing.developments[0] if existing and existing.developments else None
@@ -236,8 +239,11 @@ def run(
     with StageTimer() as stage:
         validation = validate_staged(config.bundle_path, relative_path, content)
     log_event(
-        "stage", concept=concept_id, stage="validate",
-        duration_ms=stage.duration_ms, ok=validation.ok,
+        "stage",
+        concept=concept_id,
+        stage="validate",
+        duration_ms=stage.duration_ms,
+        ok=validation.ok,
     )
     if not validation.ok:
         raise ValidationFailure(validation)

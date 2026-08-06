@@ -29,7 +29,9 @@ def parse_document(path: Path, root: Path) -> ParseResult:
                     file=relative_path,
                     line=1,
                     rule="Missing YAML frontmatter",
-                    suggested_fix="Start the document with a YAML frontmatter block delimited by ---.",
+                    suggested_fix=(
+                        "Start the document with a YAML frontmatter block delimited by ---."
+                    ),
                 )
             ]
         )

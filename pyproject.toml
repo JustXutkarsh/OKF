@@ -1,0 +1,23 @@
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["api", "consumer_a", "consumer_b", "producer", "validator"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["producer", "consumer_a", "consumer_b", "api", "validator"]
+ignore_missing_imports = true
+warn_unreachable = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+show_error_codes = true

@@ -1,0 +1,7 @@
+# Development tooling (human-maintained). Pin via: pip-compile requirements-dev.in
+ruff
+black
+mypy
+pre-commit
+pip-audit
+pip-tools

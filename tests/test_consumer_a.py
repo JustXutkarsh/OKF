@@ -9,13 +9,12 @@ import json
 import os
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest import mock
 
 from consumer_a import NOT_COVERED_SENTENCE
 from consumer_a.cli import exit_code_for, main
-from consumer_a.config import load_config
 from consumer_a.exceptions import (
     ConfigError,
     DocumentReadError,
@@ -27,10 +26,8 @@ from consumer_a.exceptions import TimeoutError as ProviderTimeoutError
 from consumer_a.llm import ChatClient, parse_briefing
 from consumer_a.models import (
     AnswerReport,
-    Briefing,
     CatalogEntry,
     ConsumerConfig,
-    RetrievalDiagnostics,
 )
 from consumer_a.renderer import render_json, render_text
 from consumer_a.retriever import (
@@ -44,7 +41,10 @@ from consumer_a.retriever import (
 )
 from consumer_a.service import ConsumerService
 
-FIXED_CLOCK = lambda: datetime(2026, 8, 6, 12, 0, 0, tzinfo=timezone.utc)
+
+def FIXED_CLOCK() -> datetime:
+    return datetime(2026, 8, 6, 12, 0, 0, tzinfo=UTC)
+
 
 NATO_DOC = """---
 schema_version: 1
@@ -82,20 +82,22 @@ Allies pledged air defense systems.
   note: Topic page.
 """
 
-UKRAINE_DOC = NATO_DOC.replace("id: nato", "id: ukraine-russia-frontline").replace(
-    "title: NATO", "title: Ukraine-Russia Frontline"
-).replace("resource: actors", "resource: conflicts").replace(
-    "tags: [actor, alliance, europe]", "tags: [conflict, ukraine, russia]"
-).replace("confidence: verified", "confidence: mixed").replace(
-    "related: [ukraine-russia-frontline]", "related: [nato]"
+UKRAINE_DOC = (
+    NATO_DOC.replace("id: nato", "id: ukraine-russia-frontline")
+    .replace("title: NATO", "title: Ukraine-Russia Frontline")
+    .replace("resource: actors", "resource: conflicts")
+    .replace("tags: [actor, alliance, europe]", "tags: [conflict, ukraine, russia]")
+    .replace("confidence: verified", "confidence: mixed")
+    .replace("related: [ukraine-russia-frontline]", "related: [nato]")
 )
 
-TARIFF_DOC = NATO_DOC.replace("id: nato", "id: us-china-tariffs").replace(
-    "title: NATO", "title: US-China Tariffs"
-).replace("resource: actors", "resource: economics").replace(
-    "tags: [actor, alliance, europe]", "tags: [economics, us-china, tariffs]"
-).replace("confidence: verified", "confidence: emerging").replace(
-    "related: [ukraine-russia-frontline]", "related: []"
+TARIFF_DOC = (
+    NATO_DOC.replace("id: nato", "id: us-china-tariffs")
+    .replace("title: NATO", "title: US-China Tariffs")
+    .replace("resource: actors", "resource: economics")
+    .replace("tags: [actor, alliance, europe]", "tags: [economics, us-china, tariffs]")
+    .replace("confidence: verified", "confidence: emerging")
+    .replace("related: [ukraine-russia-frontline]", "related: []")
 )
 
 THREE_DOC_BUNDLE = {
@@ -179,7 +181,9 @@ def snapshot_tree(root: Path) -> dict[str, str]:
 def catalog_entry(
     id: str, title: str, resource: str = "conflicts", tags: list[str] | None = None
 ) -> CatalogEntry:
-    return CatalogEntry(id=id, title=title, resource=resource, tags=tags or [], relative_path=f"{resource}/{id}.md")
+    return CatalogEntry(
+        id=id, title=title, resource=resource, tags=tags or [], relative_path=f"{resource}/{id}.md"
+    )
 
 
 class RetrievalTests(unittest.TestCase):
@@ -195,9 +199,9 @@ class RetrievalTests(unittest.TestCase):
         )
         question = "Red Sea shipping"
         tokens = ["red", "sea", "shipping"]
-        self.assertEqual(title_score(tokens, entry), 12)   # 3 hits x 4
+        self.assertEqual(title_score(tokens, entry), 12)  # 3 hits x 4
         self.assertEqual(tag_score(tokens, entry), 0)
-        self.assertEqual(id_score(tokens, entry), 6)       # 3 hits x 2
+        self.assertEqual(id_score(tokens, entry), 6)  # 3 hits x 2
         self.assertEqual(resource_score(tokens, entry), 0)
         self.assertEqual(phrase_bonus(question, entry), 5)
         self.assertEqual(total_score(question, entry), 23)
@@ -220,7 +224,11 @@ class RetrievalTests(unittest.TestCase):
         )
         for row in result.ranking:
             self.assertEqual(
-                row.title_score + row.tag_score + row.id_score + row.resource_score + row.phrase_bonus,
+                row.title_score
+                + row.tag_score
+                + row.id_score
+                + row.resource_score
+                + row.phrase_bonus,
                 row.total_score,
             )
 
@@ -233,9 +241,7 @@ class RetrievalTests(unittest.TestCase):
     def test_body_reads_only_for_selected_documents(self) -> None:
         with bundle(THREE_DOC_BUNDLE) as root:
             service = make_service(root)
-            with mock.patch(
-                "consumer_a.service.read_documents", side_effect=None
-            ) as read_spy:
+            with mock.patch("consumer_a.service.read_documents", side_effect=None) as read_spy:
                 read_spy.side_effect = lambda path, entries: __import__(
                     "consumer_a.reader", fromlist=["read_documents"]
                 ).read_documents(path, entries)
@@ -261,7 +267,9 @@ class LLMContractTests(unittest.TestCase):
 
     def test_valid_response(self) -> None:
         briefing = parse_briefing(COVERED_JSON)
-        self.assertEqual(briefing.current_situation, "NATO maintains an enhanced eastern-flank posture.")
+        self.assertEqual(
+            briefing.current_situation, "NATO maintains an enhanced eastern-flank posture."
+        )
         self.assertEqual(briefing.reasoning, "Grounded in the NATO concept document.")
 
     def test_malformed_json(self) -> None:
@@ -337,9 +345,9 @@ class LLMContractTests(unittest.TestCase):
 
     def test_json_schema_validation_errors(self) -> None:
         for broken in (
-            '{"current_situation": "s"}',                      # missing reasoning
-            '{"current_situation": "", "reasoning": ""}',     # empty situation
-            '[1, 2]',                                          # not an object
+            '{"current_situation": "s"}',  # missing reasoning
+            '{"current_situation": "", "reasoning": ""}',  # empty situation
+            "[1, 2]",  # not an object
         ):
             with self.assertRaises(LLMResponseError):
                 parse_briefing(broken)
@@ -436,7 +444,13 @@ class RendererTests(unittest.TestCase):
 
     def test_text_rendering_sections(self) -> None:
         text = render_text(self._report())
-        for heading in ("## Current Situation", "## Key Developments", "## Key Actors", "## Evidence", "## Sources"):
+        for heading in (
+            "## Current Situation",
+            "## Key Developments",
+            "## Key Actors",
+            "## Evidence",
+            "## Sources",
+        ):
             self.assertIn(heading, text)
         self.assertIn("https://www.nato.int/topic", text)
 
@@ -447,7 +461,18 @@ class RendererTests(unittest.TestCase):
         payload = json.loads(render_json(self._report()))
         self.assertEqual(
             list(payload.keys()),
-            ["answer", "reasoning", "documents_used", "evidence", "sources", "retrieval", "ranking", "generated_at", "provider", "model"],
+            [
+                "answer",
+                "reasoning",
+                "documents_used",
+                "evidence",
+                "sources",
+                "retrieval",
+                "ranking",
+                "generated_at",
+                "provider",
+                "model",
+            ],
         )
         self.assertEqual(
             list(payload["answer"].keys()),
@@ -455,7 +480,15 @@ class RendererTests(unittest.TestCase):
         )
         self.assertEqual(
             list(payload["ranking"][0].keys()),
-            ["document_id", "title_score", "tag_score", "id_score", "resource_score", "phrase_bonus", "total_score"],
+            [
+                "document_id",
+                "title_score",
+                "tag_score",
+                "id_score",
+                "resource_score",
+                "phrase_bonus",
+                "total_score",
+            ],
         )
         self.assertEqual(
             list(payload["retrieval"].keys()),

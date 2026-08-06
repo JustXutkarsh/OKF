@@ -9,8 +9,8 @@ hardcoded — every location can be overridden for deployment.
 from __future__ import annotations
 
 import os
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Mapping
 
 import yaml
 from pydantic import ValidationError

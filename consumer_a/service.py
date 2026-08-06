@@ -12,8 +12,9 @@ same object to JSON — no business-logic changes required.
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime, timezone
-from typing import Any, Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import Any
 
 from consumer_a import NOT_COVERED_SENTENCE, prompts
 from consumer_a.exceptions import RetrievalError
@@ -46,7 +47,7 @@ class ConsumerService:
     ) -> None:
         self._config = config
         self._llm_client = llm_client
-        self._clock = clock or (lambda: datetime.now(timezone.utc))
+        self._clock = clock or (lambda: datetime.now(UTC))
 
     def answer(self, question: str, max_docs: int | None = None) -> AnswerReport:
         """Answer one question strictly from the bundle."""
@@ -81,16 +82,20 @@ class ConsumerService:
                 # Not covered: never call the LLM (cost rule).
                 report = self._build_report(None, [], retrieval, diagnostics)
                 log_event(
-                    "ask.complete", question_hash=question_hash,
-                    outcome="not-covered", total_ms=total.elapsed_ms(),
+                    "ask.complete",
+                    question_hash=question_hash,
+                    outcome="not-covered",
+                    total_ms=total.elapsed_ms(),
                 )
                 return report
 
             with StageTimer() as stage:
                 documents = read_documents(config.bundle_path, retrieval.selected)
             log_event(
-                "stage", stage="read",
-                duration_ms=stage.duration_ms, documents=len(documents),
+                "stage",
+                stage="read",
+                duration_ms=stage.duration_ms,
+                documents=len(documents),
             )
 
             client = self._llm_client or ChatClient(config)
@@ -105,7 +110,8 @@ class ConsumerService:
                 briefing if covered else None, documents, retrieval, diagnostics
             )
             log_event(
-                "ask.complete", question_hash=question_hash,
+                "ask.complete",
+                question_hash=question_hash,
                 outcome="covered" if covered else "not-covered",
                 total_ms=total.elapsed_ms(),
             )
@@ -150,17 +156,21 @@ class ConsumerService:
             for doc in documents
             for source in doc.sources
         ]
-        return AnswerReport(
-            covered=covered,
-            answer=briefing
-            if covered
-            else Briefing(
+        if briefing is not None:
+            answer = briefing
+            reasoning = briefing.reasoning
+        else:
+            answer = Briefing(
                 current_situation=NOT_COVERED_SENTENCE,
                 key_developments=[],
                 key_actors=[],
                 reasoning="",
-            ),
-            reasoning=briefing.reasoning if covered else "",
+            )
+            reasoning = ""
+        return AnswerReport(
+            covered=covered,
+            answer=answer,
+            reasoning=reasoning,
             documents_used=[doc.id for doc in documents],
             evidence=evidence,
             sources=sources,

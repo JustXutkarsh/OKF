@@ -42,16 +42,20 @@ def make_note(snippet: str) -> str:
 def _published_key(value: str | None) -> date:
     """Parse a provider publication date; unknown dates sort oldest."""
 
-    if value:
-        try:
-            return date.fromisoformat(value[:10])
-        except ValueError:
-            pass
-    return date.min
+    if not value:
+        return date.min
+    try:
+        return date.fromisoformat(value[:10])
+    except ValueError:
+        return date.min
 
 
-def normalize_results(raw_items: list[dict[str, Any]]) -> list[Evidence]:
-    """Drop malformed items, keep usable fields, dedupe by canonical URL."""
+def normalize_results(raw_items: list[Any]) -> list[Evidence]:
+    """Drop malformed items, keep usable fields, dedupe by canonical URL.
+
+    Input is an untrusted provider payload: items may be any shape, hence
+    the defensive isinstance guards below (not dead code).
+    """
 
     seen: set[str] = set()
     hits: list[Evidence] = []
@@ -88,7 +92,7 @@ def rank_results(hits: list[Evidence]) -> list[Evidence]:
     return sorted(hits, key=lambda hit: _published_key(hit.published_date), reverse=True)
 
 
-def build_evidence(raw_items: list[dict[str, Any]], max_results: int) -> list[Evidence]:
+def build_evidence(raw_items: list[Any], max_results: int) -> list[Evidence]:
     """Full pipeline: normalize → dedupe → rank → cap at max_results."""
 
     return rank_results(normalize_results(raw_items))[:max_results]

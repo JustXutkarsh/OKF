@@ -85,9 +85,7 @@ def merge_sources(
         if key in seen:
             continue
         seen.add(key)
-        merged.append(
-            SourceEntry(title=hit.title, url=hit.url, accessed=accessed, note=hit.note)
-        )
+        merged.append(SourceEntry(title=hit.title, url=hit.url, accessed=accessed, note=hit.note))
     return merged
 
 
@@ -212,9 +210,7 @@ def _parse_developments(section: str) -> list[DevelopmentEntry]:
 
 def _parse_key_actors(section: str) -> list[str]:
     return [
-        line.strip()[2:].strip()
-        for line in section.splitlines()
-        if line.strip().startswith("- ")
+        line.strip()[2:].strip() for line in section.splitlines() if line.strip().startswith("- ")
     ]
 
 

@@ -13,8 +13,8 @@ Switching providers or models never requires code changes.
 from __future__ import annotations
 
 import os
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Mapping
 
 from consumer_a.exceptions import ConfigError
 from consumer_a.models import ConsumerConfig

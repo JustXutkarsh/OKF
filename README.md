@@ -145,3 +145,99 @@ Structured logs (concept id, per-stage and total durations, outcomes) go to stde
 | `Filesystem error` | 6 | Check permissions/disk for the bundle path |
 
 Deployment notes: the producer is stateless with no hardcoded paths — every location is overridable via environment. A future Dockerfile needs only a Python base image, `pip install -r requirements.txt`, and env vars; no code changes required.
+
+## Backend API (M5)
+
+FastAPI front-end composing the three components (never duplicating their logic). All endpoints live under `/api/v1/`; interactive docs at `/docs`.
+
+### Run
+
+```bash
+pip install -r requirements.txt
+export OKF_API_KEYS=my-secret-key           # required (stored hashed only)
+.venv/bin/python -m api                      # uvicorn on OKF_API_HOST:OKF_API_PORT
+```
+
+### Endpoints
+
+| Method & path | Purpose |
+|---|---|
+| `POST /api/v1/brief` | Consumer A briefing (frozen contract) |
+| `POST /api/v1/analyze` | Consumer B critical analysis (frozen contract) |
+| `POST /api/v1/compare` | A+B in parallel + deterministic comparison metadata |
+| `POST /api/v1/producer/update` | Queue async concept update → `202` job id |
+| `POST /api/v1/producer/update-all` | Queue async full update → `202` job id |
+| `GET /api/v1/jobs` / `GET /api/v1/jobs/{id}` | Job list/detail (pending→running→succeeded/failed) |
+| `GET /api/v1/health` / `ready` / `version` / `metrics` | Ops probes (health open; ready checks bundle+provider config) |
+
+### Authentication
+
+All POSTs require `Authorization: Bearer <key>`. Keys are configured via `OKF_API_KEYS` and stored **hashed only**; comparisons are constant-time. GET ops endpoints are open. `OKF_API_AUTH_DISABLED=true` exists for local dev only — never in production.
+
+### Errors & limits
+
+One envelope: `{"error": {"code", "message", "request_id"}}`. Codes: `UNAUTHORIZED`(401), `INVALID_REQUEST`(422), `RATE_LIMITED`(429), `UPSTREAM_LLM`/`UPSTREAM_SEARCH`(502), `BUNDLE_UNAVAILABLE`/`MISCONFIGURED`(503), `UPSTREAM_TIMEOUT`(504), `BUNDLE_VALIDATION_FAILED`(409), `INTERNAL`(500). Limits via `OKF_API_RATE_LIMIT` (default 60/min) and `OKF_API_PRODUCER_RATE_LIMIT` (5/min); `X-Request-ID` on every response.
+
+### Docker
+
+```bash
+docker build --build-arg OKF_API_GIT_SHA=$(git rev-parse --short HEAD) \
+             --build-arg OKF_API_BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) -t okf-api .
+docker run -p 8000:8000 -e OKF_API_KEYS=... -e TAVILY_API_KEY=... \
+           -e GROQ_API_KEY=... -e OPENAI_API_KEY=... okf-api
+# or: docker compose up --build
+```
+
+Non-root user; `HEALTHCHECK` hits `/api/v1/ready`; build provenance via build args.
+
+## System Architecture
+
+```text
+            Producer (Python)                      Consumer A (Python)   Consumer B (Python)
+            Tavily + LLM drafting                  Groq/OpenAI           OpenAI (default)
+                   │  validation-gated writes             │                    │
+                   ▼                                      │  read-only         │ read-only
+              ┌──────────────────────────┐                │                    │
+              │   okf/ bundle (git repo) │◄───────────────┴────────────────────┘
+              │   the ONLY shared artifact
+              └──────────────────────────┘
+                   ▲ composed by public interfaces (no logic duplication)
+                   │
+              Backend API (FastAPI, /api/v1) ── auth (hashed keys) ── rate limits ── jobs
+```
+
+## CI Status
+
+[![CI](https://github.com/JustXutkarsh/OKF/actions/workflows/ci.yml/badge.svg)](https://github.com/JustXutkarsh/OKF/actions/workflows/ci.yml)
+
+Quality gates (mirror of `.github/workflows/ci.yml`): Ruff → Black `--check` → mypy → 170 unit tests → bundle validator → pip-audit → Docker build. CI installs from **pinned** `requirements.txt`/`requirements-dev.txt` (generated via pip-tools; regenerate with `pip-compile requirements.in` / `pip-compile --constraint requirements.txt requirements-dev.in`).
+
+## Development Workflow
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+.venv/bin/pre-commit install        # hygiene + ruff --fix + black (fast; no mypy/tests)
+.venv/bin/python -m unittest discover -s tests
+.venv/bin/python -m validator validate okf
+.venv/bin/ruff check . && .venv/bin/black --check . && .venv/bin/mypy
+```
+
+Consumer CLIs (development use): `.venv/bin/python -m consumer_a ask "<question>" [--json] [--max-docs N]` and `.venv/bin/python -m consumer_b analyze "<question>" [--json] [--max-docs N]`.
+
+## Release Workflow
+
+1. All changes merge to `main` only with a green CI run.
+2. Update `CHANGELOG.md` (Keep a Changelog) and bump the version where it appears (`OKF_API_VERSION` default).
+3. Tag semantically: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+4. Create the GitHub release from the tag; pre-release metadata uses `vX.Y.Z-rc.N` when needed.
+
+## Deployment Workflow
+
+```bash
+docker build --build-arg OKF_API_GIT_SHA=$(git rev-parse --short HEAD) \
+             --build-arg OKF_API_BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) -t okf-api:vX.Y.Z .
+docker run -p 8000:8000 --env-file .env okf-api:vX.Y.Z
+```
+
+Production: inject real environment variables (never bake `.env` into images), run a single uvicorn worker (in-memory jobs/metrics/limiter by design), and place TLS termination in front. Readiness (`/api/v1/ready`) gates load balancers; `/api/v1/metrics` feeds Prometheus. See the API section above for authentication and the full environment-variable table.

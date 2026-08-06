@@ -161,9 +161,7 @@ def _parse_developments(section: str) -> list[DevelopmentEntry]:
 
 def _parse_bullets(section: str) -> list[str]:
     return [
-        line.strip()[2:].strip()
-        for line in section.splitlines()
-        if line.strip().startswith("- ")
+        line.strip()[2:].strip() for line in section.splitlines() if line.strip().startswith("- ")
     ]
 
 
