@@ -1,0 +1,21 @@
+services:
+  api:
+    build: .
+    image: okf-api:local
+    ports:
+      - "8000:8000"
+    # Production injects real environment variables; .env is a dev fallback
+    # and must additionally define OKF_API_KEYS (or OKF_API_AUTH_DISABLED=true).
+    env_file:
+      - .env
+    volumes:
+      # The bundle is the only shared artifact; producer jobs write here.
+      - ./okf:/app/okf
+      - ./config:/app/config
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/v1/ready', timeout=4).status == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

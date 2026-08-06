@@ -56,6 +56,16 @@ class ProducerConfig(BaseModel):
     openai_api_key: str | None = None
 
 
+class RequestTelemetry(BaseModel):
+    """Telemetry for one LLM call (own copy; additive, read-only for callers)."""
+
+    provider: str
+    model: str
+    prompt_tokens: int | None = None
+    completion_tokens: int | None = None
+    total_tokens: int | None = None
+
+
 class DevelopmentEntry(BaseModel):
     """One dated entry in the Developments log. Never rewritten."""
 

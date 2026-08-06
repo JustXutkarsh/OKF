@@ -10,12 +10,14 @@ frontmatter, headings, or dates; parse_draft enforces that contract.
 from __future__ import annotations
 
 import json
+import threading
+from typing import Any
 
 from pydantic import ValidationError
 
 from producer.config import LLM_PROVIDERS
 from producer.exceptions import ConfigError, LLMResponseError
-from producer.models import LLMDraft, ProducerConfig
+from producer.models import LLMDraft, ProducerConfig, RequestTelemetry
 
 
 class Summarizer:
@@ -40,11 +42,19 @@ class Summarizer:
         except ImportError as exc:
             raise ConfigError("openai is not installed.") from exc
 
-        kwargs: dict[str, object] = {"api_key": api_key, "timeout": config.request_timeout}
+        kwargs: dict[str, Any] = {"api_key": api_key, "timeout": config.request_timeout}
         if settings["base_url"]:
             kwargs["base_url"] = settings["base_url"]
         self._client = OpenAI(**kwargs)
         self._model = config.model
+        self._provider = provider
+        self._telemetry_tls = threading.local()
+
+    @property
+    def last_telemetry(self) -> RequestTelemetry | None:
+        """Telemetry of the most recent call on THIS thread (read-only)."""
+
+        return getattr(self._telemetry_tls, "telemetry", None)
 
     def draft(self, system_prompt: str, user_prompt: str) -> LLMDraft:
         """One chat completion returning a validated LLMDraft."""
@@ -58,6 +68,9 @@ class Summarizer:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ],
+            )
+            self._telemetry_tls.telemetry = RequestTelemetry(
+                provider=self._provider, model=self._model, **(_extract_usage(response) or {})
             )
             content = response.choices[0].message.content
         except Exception as exc:
@@ -74,6 +87,19 @@ def _friendly_error(exc: Exception, *, key_env: str) -> str:
     if "401" in text or "api key" in text or "authentication" in text:
         return f"LLM authentication failed; check {key_env} ({exc})."
     return f"LLM call failed: {exc}"
+
+
+def _extract_usage(response: object) -> dict:
+    """Pull token usage off a chat-completions response (best effort)."""
+
+    usage = getattr(response, "usage", None)
+    if usage is None:
+        return {}
+    return {
+        "prompt_tokens": getattr(usage, "prompt_tokens", None),
+        "completion_tokens": getattr(usage, "completion_tokens", None),
+        "total_tokens": getattr(usage, "total_tokens", None),
+    }
 
 
 def parse_draft(content: object) -> LLMDraft:

@@ -1,4 +1,4 @@
-"""Pydantic models for Consumer A data flow."""
+"""Pydantic models for Consumer B data flow."""
 
 from __future__ import annotations
 
@@ -8,11 +8,11 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ConsumerConfig(BaseModel):
-    """Runtime configuration for Consumer A (own loader, own env vars)."""
+    """Runtime configuration for Consumer B (own loader, own env vars)."""
 
     bundle_path: Path
-    provider: str = "groq"
-    model: str = "llama-3.3-70b-versatile"
+    provider: str = "openai"
+    model: str = "gpt-5.4-mini"
     max_docs: int = 3
     request_timeout: int = 30
     log_level: str = "INFO"
@@ -39,6 +39,7 @@ class CatalogEntry(BaseModel):
     tags: list[str] = Field(default_factory=list)
     related: list[str] = Field(default_factory=list)
     confidence: str = ""
+    schema_version: int | str = 1
     relative_path: str
 
 
@@ -99,16 +100,66 @@ class BundleDocument(BaseModel):
     key_actors: list[str] = Field(default_factory=list)
     sources: list[SourceRef] = Field(default_factory=list)
 
+    def searchable_text(self) -> str:
+        """All prose the conflict verifier may match snippets against."""
 
-class Briefing(BaseModel):
-    """The only content the LLM is allowed to produce: reasoning, no sources."""
+        parts = [self.summary]
+        parts.extend(entry.text for entry in self.developments)
+        parts.extend(self.key_actors)
+        return "\n".join(parts)
+
+
+class ConflictClaim(BaseModel):
+    """One conflicting-evidence claim as returned by the LLM.
+
+    `documents` are 1-based indexes into the prompt's document list —
+    the LLM never sees document ids. Python resolves and verifies these.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
-    current_situation: str = Field(min_length=1)
-    key_developments: list[str] = Field(default_factory=list)
-    key_actors: list[str] = Field(default_factory=list)
+    description: str = Field(min_length=1)
+    documents: list[int] = Field(min_length=1)
+    supporting_text: str = Field(min_length=1)
+    conflicting_text: str = Field(min_length=1)
+
+
+class CriticalAnalysis(BaseModel):
+    """The only content the LLM is allowed to produce: analysis, no sources.
+
+    Every field is required: the LLM must always return the complete
+    object (empty lists are fine, missing keys are a contract violation).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    assumptions: list[str]
+    conflicting_evidence: list[ConflictClaim]
+    uncertainties: list[str]
+    alternative_interpretations: list[str]
+    missing_information: list[str]
+    confidence_assessment: str
     reasoning: str
+
+
+class ResolvedConflict(BaseModel):
+    """A conflict claim verified by Python against the bundle text."""
+
+    description: str
+    document_ids: list[str]
+    supporting_text: str
+    conflicting_text: str
+
+
+class CriticalAnalysisReport(BaseModel):
+    """Python-assembled analysis: verified conflicts, deterministic shape."""
+
+    assumptions: list[str] = Field(default_factory=list)
+    conflicting_evidence: list[ResolvedConflict] = Field(default_factory=list)
+    uncertainties: list[str] = Field(default_factory=list)
+    alternative_interpretations: list[str] = Field(default_factory=list)
+    missing_information: list[str] = Field(default_factory=list)
+    confidence_assessment: str = ""
 
 
 class EvidenceEntry(BaseModel):
@@ -138,7 +189,7 @@ class AnswerReport(BaseModel):
     """
 
     covered: bool
-    answer: Briefing
+    critical_analysis: CriticalAnalysisReport
     reasoning: str = ""
     documents_used: list[str] = Field(default_factory=list)
     evidence: list[EvidenceEntry] = Field(default_factory=list)
@@ -148,3 +199,5 @@ class AnswerReport(BaseModel):
     provider: str
     model: str
     generated_at: str
+    # null unless every retrieved document agrees on one schema_version
+    bundle_version: int | str | None = 1

@@ -1,10 +1,10 @@
-"""Provider-configurable chat client and strict briefing parsing.
+"""Provider-configurable chat client and strict analysis parsing.
 
-Provider and model come entirely from configuration (OKF_CONSUMER_A_*);
+Provider and model come entirely from configuration (OKF_CONSUMER_B_*);
 switching them never requires code changes. One call per question; a
-malformed response aborts (no retry — the operator reruns). The parsing
-guard rejects anything beyond plain reasoning JSON: code fences, markdown,
-headings, YAML, URLs, citations, and unexpected fields.
+malformed response aborts (no retry). The parsing guard rejects anything
+beyond plain analysis JSON: code fences, markdown, headings, YAML, URLs,
+citations, and unexpected fields.
 """
 
 from __future__ import annotations
@@ -16,10 +16,10 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from consumer_a.config import LLM_PROVIDERS
-from consumer_a.exceptions import ConfigError, LLMResponseError
-from consumer_a.exceptions import TimeoutError as ProviderTimeoutError
-from consumer_a.models import Briefing, ConsumerConfig, RequestTelemetry
+from consumer_b.config import LLM_PROVIDERS
+from consumer_b.exceptions import ConfigError, LLMResponseError
+from consumer_b.exceptions import TimeoutError as ProviderTimeoutError
+from consumer_b.models import ConsumerConfig, CriticalAnalysis, RequestTelemetry
 
 _CITATION_PATTERN = re.compile(r"\[\d+\]")
 
@@ -61,7 +61,7 @@ class ChatClient:
         return getattr(self._telemetry_tls, "telemetry", None)
 
     def chat(self, system_prompt: str, user_prompt: str) -> str:
-        """One chat completion; returns the raw text for parse_briefing."""
+        """One chat completion; returns the raw text for parse_analysis."""
 
         try:
             response = self._client.chat.completions.create(
@@ -107,8 +107,8 @@ def _extract_usage(response: object) -> dict:
     }
 
 
-def parse_briefing(content: object) -> Briefing:
-    """Validate the LLM's raw text into a Briefing; abort on any violation."""
+def parse_analysis(content: object) -> CriticalAnalysis:
+    """Validate the LLM's raw text into a CriticalAnalysis; abort on violations."""
 
     if not isinstance(content, str) or not content.strip():
         raise LLMResponseError("Malformed LLM response: empty content.")
@@ -124,18 +124,27 @@ def parse_briefing(content: object) -> Briefing:
         raise LLMResponseError("Malformed LLM response: expected a JSON object.")
 
     try:
-        briefing = Briefing(**payload)
+        analysis = CriticalAnalysis(**payload)
     except ValidationError as exc:
-        raise LLMResponseError(f"Malformed LLM response: bad briefing schema ({exc}).") from exc
+        raise LLMResponseError(f"Malformed LLM response: bad analysis schema ({exc}).") from exc
 
-    for text_field in (
-        briefing.current_situation,
-        briefing.reasoning,
-        *briefing.key_developments,
-        *briefing.key_actors,
-    ):
+    for text_field in _all_text_fields(analysis):
         _reject_forbidden(text_field)
-    return briefing
+    return analysis
+
+
+def _all_text_fields(analysis: CriticalAnalysis) -> list[str]:
+    fields = [
+        *analysis.assumptions,
+        *analysis.uncertainties,
+        *analysis.alternative_interpretations,
+        *analysis.missing_information,
+        analysis.confidence_assessment,
+        analysis.reasoning,
+    ]
+    for claim in analysis.conflicting_evidence:
+        fields.extend([claim.description, claim.supporting_text, claim.conflicting_text])
+    return fields
 
 
 def _reject_forbidden(value: str) -> None:

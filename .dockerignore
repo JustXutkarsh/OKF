@@ -1,0 +1,16 @@
+.venv/
+.env
+.git/
+.github/
+tests/
+**/__pycache__/
+*.pyc
+.dockerignore
+Dockerfile
+compose.yaml
+*.md
+!README.md
+requirements-dev.in
+requirements-dev.txt
+.pre-commit-config.yaml
+CHANGELOG.md
