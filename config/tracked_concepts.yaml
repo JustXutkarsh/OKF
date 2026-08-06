@@ -1,0 +1,88 @@
+# Human-authored registry of tracked concepts.
+#
+# The registry is the deterministic source of truth for all non-prose
+# metadata: titles, tags, related links, key actors, and search queries.
+# The LLM is never allowed to invent any of these.
+#
+# Each entry:
+#   id:            stable concept id; file lives at okf/<resource>/<id>.md
+#   title:         human-readable title (frontmatter)
+#   resource:      bundle category; must match the parent folder (OKF009)
+#   tags:          frontmatter tags (only used when creating a new doc)
+#   related:       related concept ids; must exist in the bundle (OKF007)
+#   key_actors:    deterministic Key Actors list for newly created docs
+#   search_query:  query sent to Tavily for this concept
+#   lookback_days: optional per-concept override (default from config)
+#   max_results:   optional per-concept override (default from config)
+
+- id: nato
+  title: NATO
+  resource: actors
+  tags: [actor, alliance, europe, security]
+  related: [ukraine-russia-frontline]
+  key_actors:
+    - NATO member states
+    - NATO Secretary General
+    - Ukraine
+    - Russia
+  search_query: "NATO Ukraine military support deterrence eastern flank"
+
+- id: red-sea-shipping-disruption
+  title: Red Sea Shipping Disruption
+  resource: conflicts
+  tags: [conflict, maritime-security, trade, middle-east]
+  related: [us-china-tariffs]
+  key_actors:
+    - Houthi movement in Yemen
+    - International Maritime Organization
+    - Commercial shipping operators
+    - Regional naval and coast guard forces
+  search_query: "Red Sea shipping disruption Houthi vessel attacks Gulf of Aden"
+
+- id: ukraine-russia-frontline
+  title: Ukraine-Russia Frontline
+  resource: conflicts
+  tags: [conflict, ukraine, russia, europe]
+  related: [nato]
+  key_actors:
+    - Ukraine
+    - Russia
+    - NATO
+    - European and U.S. defense suppliers
+  search_query: "Ukraine Russia war frontline drone strikes oil facilities"
+
+- id: us-china-tariffs
+  title: US-China Tariffs
+  resource: economics
+  tags: [economics, us-china, trade, tariffs]
+  related: [us-export-controls-semiconductors]
+  key_actors:
+    - Office of the United States Trade Representative
+    - U.S. importers and manufacturers
+    - Government of China
+    - Customs and trade compliance teams
+  search_query: "USTR Section 301 China tariffs exclusions investigation"
+
+- id: us-export-controls-semiconductors
+  title: US Semiconductor Export Controls
+  resource: policy
+  tags: [policy, us-china, semiconductors, export-controls]
+  related: [us-china-tariffs]
+  key_actors:
+    - U.S. Bureau of Industry and Security
+    - Department of Commerce
+    - Semiconductor equipment and chip firms
+    - Chinese semiconductor manufacturers
+  search_query: "BIS semiconductor export controls China advanced computing"
+
+- id: opec-plus-production-policy
+  title: OPEC+ Production Policy
+  resource: economics
+  tags: [economics, energy, oil, opec-plus]
+  related: [red-sea-shipping-disruption]
+  key_actors:
+    - OPEC+ member states
+    - Saudi Arabia
+    - Russia
+    - United States
+  search_query: "OPEC+ production policy oil output quotas decision"
