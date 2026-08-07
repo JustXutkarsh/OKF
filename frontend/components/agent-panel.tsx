@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-import type { AgentLifecycle } from "@/lib/agent-lifecycle";
+import { deriveStatus, type AgentLifecycle } from "@/lib/agent-lifecycle";
 import { ActivityTimeline } from "@/components/activity-timeline";
+import { EvidenceScan } from "@/components/evidence-scan";
+import { StatusLight } from "@/components/status-light";
 import type { LucideIcon } from "lucide-react";
 
 export interface AgentIdentity {
@@ -28,8 +30,9 @@ const STATUS_COPY: Record<AgentLifecycle["phase"], string> = {
 
 /**
  * One agent's workspace: identity header (avatar, callsign, live-status chip),
- * the activity timeline while working, then the report body. Everything is
- * framed by the agent's accent color so two agents are instantly legible.
+ * status light, the activity timeline while working, then the report body.
+ * Everything is framed by the agent's accent color so two agents are
+ * instantly legible.
  */
 export function AgentPanel({
   agent,
@@ -42,6 +45,7 @@ export function AgentPanel({
 }) {
   const { phase } = lifecycle;
   const busy = phase === "working";
+  const status = deriveStatus(lifecycle);
 
   return (
     <motion.section
@@ -53,7 +57,7 @@ export function AgentPanel({
       className={`glass flex min-h-[280px] flex-col overflow-hidden rounded-2xl border ${busy ? "agent-ring agent-glow" : ""}`}
       aria-label={agent.title}
     >
-      {/* Agent header */}
+      {/* Agent header: identity + live status */}
       <header className="flex items-start gap-3 border-b p-4">
         <div
           className={`flex size-9 shrink-0 items-center justify-center rounded-lg border bg-background/60 ${busy ? "agent-glow" : ""}`}
@@ -62,9 +66,12 @@ export function AgentPanel({
           <agent.Icon className="size-5" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            {agent.callsign}
-          </p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              {agent.callsign}
+            </p>
+            <StatusLight status={status} />
+          </div>
           <div className="flex items-center gap-2">
             <h2 className="truncate text-sm font-semibold">{agent.title}</h2>
             <motion.span
@@ -85,11 +92,14 @@ export function AgentPanel({
         </div>
       </header>
 
-      {/* Activity timeline while the agent works */}
+      {/* Working state: live timeline, then evidence-scan shimmer. */}
       <div className="min-h-0 flex-1">
         {busy && (
           <div className="border-b p-3">
             <ActivityTimeline lifecycle={lifecycle} />
+            <div className="mt-3">
+              <EvidenceScan active={busy} />
+            </div>
           </div>
         )}
         <div className="p-4">{children}</div>

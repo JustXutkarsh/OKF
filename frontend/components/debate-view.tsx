@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { RadarIcon, ScaleIcon } from "lucide-react";
 import type { Analysis, Briefing } from "@/lib/types";
+import { ConfidenceViz } from "@/components/confidence-viz";
 import { ListSection, SectionCard } from "@/components/section-card";
 import { Reveal, StaggerGroup } from "@/components/reveal";
 
@@ -93,7 +94,17 @@ export function DebateView({ briefing, analysis }: { briefing: Briefing; analysi
     <StaggerGroup className="space-y-3">
       {exchanges.map(playOf)}
 
-      {/* Divergence surfaced: conflicts + information gaps */}
+      {/* Divergence surfaced: confidence contrast, conflicts, information gaps */}
+      <Reveal>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <SectionCard title="Briefing confidence profile">
+            <ConfidenceViz evidence={briefing.evidence} />
+          </SectionCard>
+          <SectionCard title="Critic confidence profile">
+            <ConfidenceViz evidence={analysis.evidence} />
+          </SectionCard>
+        </div>
+      </Reveal>
       <Reveal>
         <div className="grid gap-4 lg:grid-cols-2">
           <SectionCard title="Points of conflict">

@@ -1,6 +1,7 @@
 "use client";
 
 import type { Analysis } from "@/lib/types";
+import { ConfidenceViz } from "@/components/confidence-viz";
 import { EvidenceGallery } from "@/components/evidence-card";
 import { MetaFooter } from "@/components/meta-footer";
 import { Reveal, StaggerGroup } from "@/components/reveal";
@@ -97,6 +98,12 @@ export function AnalysisContent({ data }: { data: Analysis }) {
             <ListSection items={analysis.missing_information} />
           </SectionCard>
         </div>
+      </Reveal>
+
+      <Reveal>
+        <SectionCard title="Confidence Breakdown">
+          <ConfidenceViz evidence={data.evidence} />
+        </SectionCard>
       </Reveal>
 
       <Reveal>

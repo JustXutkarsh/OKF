@@ -13,6 +13,41 @@ import { useEffect, useState } from "react";
 
 export type AgentPhase = "idle" | "working" | "done" | "error";
 
+/** Statuses surfaced to the user (state indicators + ops log). */
+export type AgentStatus =
+  | "idle"
+  | "searching"
+  | "analyzing"
+  | "writing"
+  | "completed"
+  | "error";
+
+// Segment mapping: the first stage is retrieval ("searching"), the middle
+// stages cross-examine ("analyzing"), the tail composes ("writing"). The
+// mapping is deterministic and descriptive — never false precision.
+const SEARCHING_LAST = 0;
+const ANALYZING_LAST = 2;
+
+export function deriveStatus(lifecycle: {
+  phase: AgentPhase;
+  stageIndex: number;
+}): AgentStatus {
+  switch (lifecycle.phase) {
+    case "idle":
+      return "idle";
+    case "done":
+      return "completed";
+    case "error":
+      return "error";
+    case "working": {
+      const i = lifecycle.stageIndex;
+      if (i <= SEARCHING_LAST) return "searching";
+      if (i <= ANALYZING_LAST) return "analyzing";
+      return "writing";
+    }
+  }
+}
+
 export interface AgentLifecycle {
   phase: AgentPhase;
   /** Index into `stages` shown as the current activity (working only). */

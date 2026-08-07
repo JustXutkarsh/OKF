@@ -1,6 +1,7 @@
 "use client";
 
 import type { Briefing } from "@/lib/types";
+import { ConfidenceViz } from "@/components/confidence-viz";
 import { EvidenceGallery } from "@/components/evidence-card";
 import { MetaFooter } from "@/components/meta-footer";
 import { Reveal, StaggerGroup } from "@/components/reveal";
@@ -66,6 +67,12 @@ export function BriefingContent({ data }: { data: Briefing }) {
             <ListSection items={data.answer.key_actors} />
           </SectionCard>
         </div>
+      </Reveal>
+
+      <Reveal>
+        <SectionCard title="Confidence Breakdown">
+          <ConfidenceViz evidence={data.evidence} />
+        </SectionCard>
       </Reveal>
 
       <Reveal>

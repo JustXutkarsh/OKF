@@ -3,13 +3,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { RadarIcon, ScaleIcon } from "lucide-react";
 import { api } from "@/lib/api";
-import { useAgentLifecycle } from "@/lib/agent-lifecycle";
+import { deriveStatus, useAgentLifecycle } from "@/lib/agent-lifecycle";
+import { useOpsTrace } from "@/lib/ops-trace";
 import type { QuestionParams } from "@/components/question-form";
 import { AgentPanel, type AgentIdentity } from "@/components/agent-panel";
 import { AnalysisContent } from "@/components/analysis-view";
 import { BriefingContent } from "@/components/briefing-view";
 import { DebateView } from "@/components/debate-view";
-import { DebugPanel } from "@/components/debug-panel";
+import { OpsLog } from "@/components/ops-log";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ErrorCard } from "@/components/section-card";
 
@@ -65,25 +66,20 @@ export function AgentWorkspace({
   const briefLife = useAgentLifecycle(brief, true, BRIEFING_AGENT.phases);
   const analyzeLife = useAgentLifecycle(analyze, true, ANALYSIS_AGENT.phases);
 
-  const dev = process.env.NODE_ENV === "development";
+  // Live ops trace: one line per real agent state transition.
+  const events = useOpsTrace(
+    [
+      { agent: BRIEFING_AGENT.title, query: brief, lifecycle: briefLife },
+      { agent: ANALYSIS_AGENT.title, query: analyze, lifecycle: analyzeLife },
+    ],
+    true
+  );
+
   const bothDone = brief.isSuccess && analyze.isSuccess;
 
   return (
     <div className="space-y-4">
-      {dev && (
-        <div className="grid gap-3 lg:grid-cols-2">
-          <DebugPanel
-            queryKey={JSON.stringify(["brief", params.question, params.maxDocs])}
-            query={brief}
-            route="/brief"
-          />
-          <DebugPanel
-            queryKey={JSON.stringify(["analyze", params.question, params.maxDocs])}
-            query={analyze}
-            route="/analyze"
-          />
-        </div>
-      )}
+      <OpsLog events={events} />
 
       {mode === "debate" && bothDone ? (
         <DebateView briefing={brief.data} analysis={analyze.data} />
@@ -111,3 +107,6 @@ export function AgentWorkspace({
     </div>
   );
 }
+
+// Re-export for existing consumers (tests keep extending this).
+export { deriveStatus };
