@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 // descriptive states, not percentages, not fake completion. When the
 // query settles, the state snaps to its true terminal immediately.
 
-export type AgentPhase = "idle" | "working" | "done" | "error";
+export type AgentPhase = "idle" | "working" | "debating" | "done" | "error";
 
 /** Statuses surfaced to the user (state indicators + ops log). */
 export type AgentStatus =
@@ -19,6 +19,7 @@ export type AgentStatus =
   | "searching"
   | "analyzing"
   | "writing"
+  | "debating"
   | "completed"
   | "error";
 
@@ -35,6 +36,8 @@ export function deriveStatus(lifecycle: {
   switch (lifecycle.phase) {
     case "idle":
       return "idle";
+    case "debating":
+      return "debating";
     case "done":
       return "completed";
     case "error":

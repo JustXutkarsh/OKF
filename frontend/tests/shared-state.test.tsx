@@ -89,27 +89,41 @@ describe("shared question state drives both agents", () => {
     vi.unstubAllGlobals();
   });
 
-  it("both agents render their reports — and Debate mode combines them", async () => {
+  it("three-column layout renders; debate stream fires after both agents complete", async () => {
     const calls: string[] = [];
     installFetchMock(calls);
+    // Mock the knowledge graph fetch too.
+    const gFetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/api/graph")) {
+        return new Response(JSON.stringify({ nodes: [], edges: [], errors: [] }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      calls.push(url);
+      const body = url.includes("/analyze") ? VALID_ANALYZE : VALID_BRIEF;
+      return new Response(JSON.stringify(body), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    });
+    vi.stubGlobal("fetch", gFetch);
     mount();
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText(/question/i), "NATO posture");
     await user.click(screen.getByRole("button", { name: /^ask$/i }));
 
-    // Both agent panels reach their reports.
-    expect(
-      (await screen.findAllByText("Current Situation", undefined, { timeout: 10000 })).length
-    ).toBeGreaterThan(0);
-    expect(
-      (await screen.findAllByText("Confidence Assessment", undefined, { timeout: 10000 })).length
-    ).toBeGreaterThan(0);
+    // All three columns visible in one layout.
+    expect(await screen.findByText("Knowledge graph", undefined, { timeout: 10000 })).toBeInTheDocument();
+    expect(await screen.findByText("Current Situation", undefined, { timeout: 10000 })).toBeInTheDocument();
+    expect(await screen.findByText("Confidence Assessment", undefined, { timeout: 10000 })).toBeInTheDocument();
+    expect(await screen.findByText("Debate stream", undefined, { timeout: 10000 })).toBeInTheDocument();
 
-    // Switch to Debate: interleaved argument appears.
-    await user.click(screen.getByRole("button", { name: /debate/i }));
-    expect(await screen.findByText(/Briefing says · Current situation/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Critic responds · Confidence assessment/i)).toBeInTheDocument();
+    // Debate stream fires after both agents done — verbatim content appears.
+    expect(await screen.findByText("Situation.", undefined, { timeout: 15000 })).toBeInTheDocument();
+    expect(await screen.findByText("Assess", undefined, { timeout: 15000 })).toBeInTheDocument();
     vi.unstubAllGlobals();
   });
 });

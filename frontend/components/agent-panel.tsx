@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 import { deriveStatus, type AgentLifecycle } from "@/lib/agent-lifecycle";
 import { ActivityTimeline } from "@/components/activity-timeline";
-import { EvidenceScan } from "@/components/evidence-scan";
 import { StatusLight } from "@/components/status-light";
 import type { LucideIcon } from "lucide-react";
 
@@ -24,6 +23,7 @@ export interface AgentIdentity {
 const STATUS_COPY: Record<AgentLifecycle["phase"], string> = {
   idle: "standby",
   working: "live",
+  debating: "debate",
   done: "report ready",
   error: "signal lost",
 };
@@ -92,14 +92,11 @@ export function AgentPanel({
         </div>
       </header>
 
-      {/* Working state: live timeline, then evidence-scan shimmer. */}
+      {/* Working state: live timeline only (scan shimmer lives in the radar panel). */}
       <div className="min-h-0 flex-1">
         {busy && (
           <div className="border-b p-3">
             <ActivityTimeline lifecycle={lifecycle} />
-            <div className="mt-3">
-              <EvidenceScan active={busy} />
-            </div>
           </div>
         )}
         <div className="p-4">{children}</div>

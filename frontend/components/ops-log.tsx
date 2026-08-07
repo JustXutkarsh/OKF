@@ -10,6 +10,7 @@ const STATUS_COLOR: Record<OpsEvent["status"], string> = {
   searching: "text-cyan-300",
   analyzing: "text-cyan-200",
   writing: "text-amber-300",
+  debating: "text-violet-300",
   completed: "text-emerald-300",
   error: "text-red-300",
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle2, XCircle, Search, ScanSearch, PenLine, Circle } from "lucide-react";
+import { CheckCircle2, XCircle, Search, ScanSearch, PenLine, Circle, Swords } from "lucide-react";
 import type { AgentStatus } from "@/lib/agent-lifecycle";
 
 const STATUS_META: Record<
@@ -12,6 +12,7 @@ const STATUS_META: Record<
   searching: { label: "searching", icon: Search, animated: true, color: "hsl(var(--agent-color))" },
   analyzing: { label: "analyzing", icon: ScanSearch, animated: true, color: "hsl(var(--agent-color))" },
   writing: { label: "writing", icon: PenLine, animated: true, color: "hsl(var(--agent-color))" },
+  debating: { label: "debating", icon: Swords, animated: true, color: "hsl(var(--agent-color))" },
   completed: { label: "completed", icon: CheckCircle2, animated: false, color: "hsl(164 86% 40%)" },
   error: { label: "error", icon: XCircle, animated: false, color: "hsl(var(--destructive))" },
 };

@@ -2,24 +2,22 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Columns2, MessageSquareQuote } from "lucide-react";
 import { AgentEmptyState } from "@/components/agent-empty-state";
-import { AgentWorkspace, type WorkspaceMode } from "@/components/agent-workspace";
+import { AgentOpsCenter } from "@/components/agent-workspace";
+import { DebateColumn } from "@/components/debate-column";
+import { KnowledgeGraphPanel } from "@/components/knowledge-graph-panel";
 import { QuestionForm, type QuestionParams } from "@/components/question-form";
 import { TopNav } from "@/components/top-nav";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   const [params, setParams] = useState<QuestionParams | null>(null);
-  const [mode, setMode] = useState<WorkspaceMode>("agents");
 
   const activeLoading = false; // loading is handled inside the workspace queries
 
   return (
     <div className="lab-grid min-h-screen bg-background">
       <TopNav />
-      <main className="mx-auto max-w-7xl space-y-6 px-4 pb-20 pt-8">
+      <main className="mx-auto max-w-[1500px] space-y-6 px-4 pb-16 pt-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
@@ -33,37 +31,6 @@ export default function HomePage() {
               then report against each other.
             </p>
           </div>
-          {/* Mode switch: agents vs debate */}
-          <div
-            role="tablist"
-            aria-label="View mode"
-            className="glass inline-flex shrink-0 items-center gap-1 rounded-full border p-1"
-          >
-            <Button
-              size="sm"
-              variant="ghost"
-              disabled={!params}
-              onClick={() => setMode("agents")}
-              className={cn(
-                "h-7 rounded-full px-3 text-xs",
-                mode === "agents" && "bg-secondary font-semibold"
-              )}
-            >
-              <Columns2 className="size-3.5" /> Agents
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              disabled={!params}
-              onClick={() => setMode("debate")}
-              className={cn(
-                "h-7 rounded-full px-3 text-xs",
-                mode === "debate" && "bg-secondary font-semibold"
-              )}
-            >
-              <MessageSquareQuote className="size-3.5" /> Debate
-            </Button>
-          </div>
         </div>
 
         <div className="glass rounded-2xl border p-4">
@@ -73,12 +40,20 @@ export default function HomePage() {
         <AnimatePresence mode="popLayout" initial={false}>
           {params ? (
             <motion.div
-              key="workspace"
+              key="ops"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
+              className="grid gap-4 xl:grid-cols-[300px_minmax(0,1fr)_360px]"
             >
-              <AgentWorkspace params={params} mode={mode} />
+              {/* Column 1: knowledge graph */}
+              <KnowledgeGraphPanel />
+
+              {/* Column 2: agent operations center */}
+              <AgentOpsCenter params={params} />
+
+              {/* Column 3: debate stream */}
+              <DebateColumn params={params} />
             </motion.div>
           ) : (
             <motion.div
@@ -86,9 +61,21 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
-              className="py-8"
+              className="grid gap-4 xl:grid-cols-[300px_minmax(0,1fr)_360px]"
             >
-              <AgentEmptyState />
+              <KnowledgeGraphPanel />
+              <div className="py-8">
+                <AgentEmptyState />
+              </div>
+              <div className="glass flex min-h-[240px] flex-col items-center justify-center rounded-2xl border p-6 text-center">
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  Debate stream
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Once both agents report, the exchange replays here — verbatim from
+                  each agent's own output.
+                </p>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

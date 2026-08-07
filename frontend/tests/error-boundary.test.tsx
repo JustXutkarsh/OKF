@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { AnalysisContent } from "@/components/analysis-view";
-import { AgentWorkspace } from "@/components/agent-workspace";
+import { AgentOpsCenter } from "@/components/agent-workspace";
 import { recordDiagnostics, clearDiagnostics } from "@/lib/diagnostics";
 import type { Analysis } from "@/lib/types";
 
@@ -101,7 +101,7 @@ describe("Analysis page can never render blank", () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     render(
       <QueryClientProvider client={client}>
-        <AgentWorkspace params={{ question: "q", maxDocs: 1 }} mode="agents" />
+        <AgentOpsCenter params={{ question: "q", maxDocs: 1 }} />
       </QueryClientProvider>
     );
 
