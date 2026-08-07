@@ -110,8 +110,15 @@ def main(argv: list[str] | None = None) -> int:
         return EXIT_OK
     except ValidationFailure as exc:
         print(format_human(exc.result))
+        if exc.staged_bundle:
+            print(f"\nStaged bundle kept for debugging: {exc.staged_bundle}")
         print("\nBundle not modified.")
-        log_event("run.failed", concept=label, error_type="ValidationFailure")
+        log_event(
+            "run.failed",
+            concept=label,
+            error_type="ValidationFailure",
+            staged_bundle=exc.staged_bundle,
+        )
         return EXIT_VALIDATION
     except (ProducerError, OSError) as exc:
         if isinstance(exc, OSError):
@@ -237,7 +244,7 @@ def run(
 
     content = render_document(updated)
     with StageTimer() as stage:
-        validation = validate_staged(config.bundle_path, relative_path, content)
+        validation, staged_bundle = validate_staged(config.bundle_path, relative_path, content)
     log_event(
         "stage",
         concept=concept_id,
@@ -246,7 +253,7 @@ def run(
         ok=validation.ok,
     )
     if not validation.ok:
-        raise ValidationFailure(validation)
+        raise ValidationFailure(validation, staged_bundle=staged_bundle)
 
     sources_added = len(updated.sources) - (len(existing.sources) if existing else 0)
     action = "update" if existing else "creation"

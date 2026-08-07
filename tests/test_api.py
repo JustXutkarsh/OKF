@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import hashlib
+import tempfile
 import time
 import unittest
 from dataclasses import replace
@@ -96,6 +97,53 @@ def wait_for_job(client: TestClient, job_id: str, timeout: float = 5.0) -> dict:
             return record
         time.sleep(0.05)
     raise AssertionError("job did not finish in time")
+
+
+class ApiConfigLoadingTests(unittest.TestCase):
+    """Regression: backend must resolve OKF_API_KEYS from env or .env."""
+
+    def _dotenv(self, content: str):
+        tmp = tempfile.TemporaryDirectory()
+        path = Path(tmp.name) / ".env"
+        path.write_text(content, encoding="utf-8")
+        self.addCleanup(tmp.cleanup)
+        return path
+
+    def test_keys_loaded_from_dotenv(self) -> None:
+        from api.core.config import load_settings
+
+        dotenv = self._dotenv("OKF_API_KEYS=alpha-key\n")
+        settings = load_settings(env={}, dotenv_path=dotenv)
+        self.assertEqual(settings.api_key_hashes, {hash_api_key("alpha-key")})
+        self.assertTrue(settings.auth_configured)
+
+    def test_multiple_comma_separated_keys(self) -> None:
+        from api.core.config import load_settings
+
+        dotenv = self._dotenv("OKF_API_KEYS=alpha-key, beta-key ,gamma-key\n")
+        settings = load_settings(env={}, dotenv_path=dotenv)
+        self.assertEqual(len(settings.api_key_hashes), 3)
+        self.assertIn(hash_api_key("beta-key"), settings.api_key_hashes)
+
+    def test_environment_overrides_dotenv(self) -> None:
+        from api.core.config import load_settings
+
+        dotenv = self._dotenv("OKF_API_KEYS=from-file\n")
+        settings = load_settings(env={"OKF_API_KEYS": "from-env"}, dotenv_path=dotenv)
+        self.assertEqual(settings.api_key_hashes, {hash_api_key("from-env")})
+
+    def test_missing_keys_everywhere_is_not_configured(self) -> None:
+        from api.core.config import load_settings
+
+        settings = load_settings(env={}, dotenv_path=None)
+        self.assertFalse(settings.auth_configured)
+
+    def test_plaintext_keys_never_stored(self) -> None:
+        from api.core.config import load_settings
+
+        dotenv = self._dotenv("OKF_API_KEYS=super-secret-value\n")
+        settings = load_settings(env={}, dotenv_path=dotenv)
+        self.assertNotIn("super-secret-value", settings.api_key_hashes)
 
 
 class AuthenticationTests(unittest.TestCase):
@@ -436,6 +484,69 @@ class JobManagerTests(unittest.TestCase):
         time.sleep(0.3)
         self.assertEqual([j.job_id for j in manager.list()], [second.job_id, first.job_id])
         manager.shutdown()
+
+    def test_validation_failure_job_payload_keeps_full_detail(self) -> None:
+        """A failing producer job exposes every validator error + staged path."""
+        from producer.exceptions import ValidationFailure
+        from validator.models import ValidationError, ValidationResult
+
+        def boom() -> dict:
+            raise ValidationFailure(
+                ValidationResult(
+                    checked=3,
+                    errors=[
+                        ValidationError(
+                            code="OKF011",
+                            file="actors/nato.md",
+                            line=42,
+                            rule="Malformed source entry",
+                            suggested_fix="Add `accessed` to the source.",
+                        )
+                    ],
+                ),
+                staged_bundle="/tmp/okf-stage-test/bundle",
+            )
+
+        manager = JobManager(retention=10, max_workers=1)
+        record = manager.submit("producer.update", boom)
+        deadline = time.time() + 3
+        while manager.get(record.job_id).status != "failed" and time.time() < deadline:
+            time.sleep(0.02)
+        manager.shutdown()
+
+        record = manager.get(record.job_id)
+        assert record is not None and record.error is not None
+        self.assertEqual(record.error["code"], "BUNDLE_VALIDATION_FAILED")
+        self.assertEqual(record.error["staged_bundle"], "/tmp/okf-stage-test/bundle")
+        errors = record.error["validation_errors"]
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(
+            errors[0],
+            {
+                "code": "OKF011",
+                "file": "actors/nato.md",
+                "line": 42,
+                "message": "Malformed source entry",
+                "suggestion": "Add `accessed` to the source.",
+            },
+        )
+
+    def test_failure_job_without_details_shape_unchanged(self) -> None:
+        """Plain failures still produce exactly {code, message}."""
+
+        def boom() -> dict:
+            raise ValueError("boom")  # unexpected: maps to INTERNAL, no details
+
+        manager = JobManager(retention=10, max_workers=1)
+        record = manager.submit("t", boom)
+        deadline = time.time() + 3
+        while manager.get(record.job_id).status != "failed" and time.time() < deadline:
+            time.sleep(0.02)
+        manager.shutdown()
+
+        record = manager.get(record.job_id)
+        assert record is not None and record.error is not None
+        self.assertEqual(set(record.error.keys()), {"code", "message"})
 
 
 class OpenAPITests(unittest.TestCase):

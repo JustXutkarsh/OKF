@@ -174,6 +174,16 @@ export OKF_API_KEYS=my-secret-key           # required (stored hashed only)
 
 All POSTs require `Authorization: Bearer <key>`. Keys are configured via `OKF_API_KEYS` and stored **hashed only**; comparisons are constant-time. GET ops endpoints are open. `OKF_API_AUTH_DISABLED=true` exists for local dev only — never in production.
 
+**`OKF_API_KEYS` is required to start the backend** (startup fails fast otherwise). Set it in your environment (production) or in `.env` (development, gitignored):
+
+```dotenv
+OKF_API_KEYS=okf_your-long-random-key
+# multiple keys, comma-separated:
+# OKF_API_KEYS=key-one,key-two
+```
+
+Loading precedence follows 12-factor: process environment variables always override `.env`. Keys are hashed with SHA-256 at load time; plaintext never persists.
+
 ### Errors & limits
 
 One envelope: `{"error": {"code", "message", "request_id"}}`. Codes: `UNAUTHORIZED`(401), `INVALID_REQUEST`(422), `RATE_LIMITED`(429), `UPSTREAM_LLM`/`UPSTREAM_SEARCH`(502), `BUNDLE_UNAVAILABLE`/`MISCONFIGURED`(503), `UPSTREAM_TIMEOUT`(504), `BUNDLE_VALIDATION_FAILED`(409), `INTERNAL`(500). Limits via `OKF_API_RATE_LIMIT` (default 60/min) and `OKF_API_PRODUCER_RATE_LIMIT` (5/min); `X-Request-ID` on every response.

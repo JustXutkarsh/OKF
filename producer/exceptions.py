@@ -32,7 +32,21 @@ class DocumentParseError(ProducerError):
 class ValidationFailure(ProducerError):
     """Raised when the staged bundle fails validation; nothing is written."""
 
-    def __init__(self, result: ValidationResult) -> None:
+    def __init__(self, result: ValidationResult, staged_bundle: str | None = None) -> None:
         codes = ", ".join(sorted({error.code for error in result.errors}))
-        super().__init__(f"Staged bundle failed validation: {codes}")
+        message = f"Staged bundle failed validation: {codes}"
+        if staged_bundle:
+            message += f" (staged bundle kept at: {staged_bundle})"
+        super().__init__(message)
         self.result = result
+        self.staged_bundle = staged_bundle
+        self.validation_errors = [
+            {
+                "code": error.code,
+                "file": error.file,
+                "line": error.line,
+                "message": error.rule,
+                "suggestion": error.suggested_fix,
+            }
+            for error in result.errors
+        ]

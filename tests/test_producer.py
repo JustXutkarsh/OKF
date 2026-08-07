@@ -769,5 +769,159 @@ class UpdateAllTests(unittest.TestCase):
         self.assertFalse((config.bundle_path / "economics/broken-concept.md").exists())
 
 
+class ValidationDebuggingTests(unittest.TestCase):
+    """Observability regression: full validation detail survives to the caller."""
+
+    def test_failure_carries_full_validation_errors(self) -> None:
+        """ValidationFailure.validation_errors has code/file/line/message/suggestion."""
+
+        with two_doc_project(REGISTRY_WITH_BROKEN_LINK) as config:
+            with self.assertRaises(ValidationFailure) as ctx:
+                run(
+                    "broken-concept",
+                    config=config,
+                    search_client=FakeSearch(RAW_RESULTS),
+                    summarizer=FakeSummarizer(),
+                    today=TODAY,
+                )
+
+        errors = ctx.exception.validation_errors
+        self.assertTrue(errors)
+        first = errors[0]
+        self.assertEqual(set(first), {"code", "file", "line", "message", "suggestion"})
+        self.assertEqual(first["code"], "OKF007")
+        self.assertTrue(first["file"])
+        self.assertTrue(first["message"])
+        self.assertTrue(first["suggestion"])
+        self.assertIn("OKF007", str(ctx.exception))
+        self.assertIsNone(ctx.exception.staged_bundle)
+
+    def test_errors_logged_before_failure(self) -> None:
+        """Every validation error is logged individually before the failure."""
+
+        with two_doc_project(REGISTRY_WITH_BROKEN_LINK) as config:
+            with self.assertLogs("producer", level="INFO") as logs:
+                try:
+                    run(
+                        "broken-concept",
+                        config=config,
+                        search_client=FakeSearch(RAW_RESULTS),
+                        summarizer=FakeSummarizer(),
+                        today=TODAY,
+                    )
+                except ValidationFailure:
+                    pass
+
+        lines = "\n".join(logs.output)
+        self.assertIn("validation.error", lines)
+        self.assertIn("code=OKF007", lines)
+        self.assertIn("file=economics/broken-concept.md", lines)
+
+    def test_keep_failed_stage_preserves_bundle(self) -> None:
+        """OKF_KEEP_FAILED_STAGE=true keeps the staged bundle and returns its path."""
+
+        from producer.validator_adapter import validate_staged
+
+        with two_doc_project() as config:
+            with mock.patch.dict(os.environ, {"OKF_KEEP_FAILED_STAGE": "true"}):
+                with self.assertLogs("producer", level="INFO") as logs:
+                    result, staged_path = validate_staged(
+                        config.bundle_path, "actors/nato.md", "not valid yaml"
+                    )
+
+        self.assertFalse(result.ok)
+        self.assertIsNotNone(staged_path)
+        assert staged_path is not None
+        kept = Path(staged_path)
+        try:
+            self.assertTrue(kept.is_dir())
+            self.assertEqual(
+                (kept / "actors/nato.md").read_text(encoding="utf-8"), "not valid yaml"
+            )
+            self.assertTrue((kept / "conflicts/ukraine-russia-frontline.md").exists())
+            self.assertIn(str(kept), "\n".join(logs.output))
+        finally:
+            import shutil
+
+            shutil.rmtree(kept.parent, ignore_errors=True)
+
+    def test_without_debug_env_staged_bundle_is_removed(self) -> None:
+        """Default (unset) keeps nothing on disk and returns no path."""
+
+        from producer.validator_adapter import validate_staged
+
+        with two_doc_project() as config:
+            env = {key: value for key, value in os.environ.items()}
+            env.pop("OKF_KEEP_FAILED_STAGE", None)
+            with mock.patch.dict(os.environ, env, clear=True):
+                result, staged_path = validate_staged(
+                    config.bundle_path, "actors/nato.md", "not valid yaml"
+                )
+
+        self.assertFalse(result.ok)
+        self.assertIsNone(staged_path)
+
+
+class ApiValidationDetailTests(unittest.TestCase):
+    """API surface: job/HTTP mapping keeps the full diagnostics."""
+
+    def test_map_component_error_includes_validation_details(self) -> None:
+        from api.core.errors import map_component_error
+
+        failure = ValidationFailure(
+            __import__("validator.models", fromlist=["ValidationResult"]).ValidationResult(
+                checked=2,
+                errors=[
+                    __import__("validator.models", fromlist=["ValidationError"]).ValidationError(
+                        code="OKF011",
+                        file="actors/nato.md",
+                        line=42,
+                        rule="Malformed source entry",
+                        suggested_fix="Add `accessed` to the source.",
+                    )
+                ],
+            ),
+            staged_bundle="/tmp/okf-stage-abc/nukes",
+        )
+        mapped = map_component_error(failure)
+        self.assertEqual(mapped.status, 409)
+        self.assertEqual(mapped.code, "BUNDLE_VALIDATION_FAILED")
+        assert mapped.details is not None
+        errors = mapped.details["validation_errors"]
+        assert isinstance(errors, list)
+        self.assertEqual(
+            errors[0],
+            {
+                "code": "OKF011",
+                "file": "actors/nato.md",
+                "line": 42,
+                "message": "Malformed source entry",
+                "suggestion": "Add `accessed` to the source.",
+            },
+        )
+        self.assertEqual(mapped.details["staged_bundle"], "/tmp/okf-stage-abc/nukes")
+
+    def test_map_component_error_without_staged_bundle_omits_key(self) -> None:
+        from api.core.errors import map_component_error
+
+        failure = ValidationFailure(
+            __import__("validator.models", fromlist=["ValidationResult"]).ValidationResult(
+                checked=1,
+                errors=[
+                    __import__("validator.models", fromlist=["ValidationError"]).ValidationError(
+                        code="OKF007",
+                        file="x.md",
+                        rule="Broken link",
+                        suggested_fix="Fix the link.",
+                    )
+                ],
+            )
+        )
+        mapped = map_component_error(failure)
+        assert mapped.details is not None
+        self.assertNotIn("staged_bundle", mapped.details)
+        self.assertEqual(mapped.details["validation_errors"][0]["code"], "OKF007")
+
+
 if __name__ == "__main__":
     unittest.main()

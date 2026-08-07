@@ -14,13 +14,26 @@ from api.models.errors import ErrorBody, ErrorEnvelope
 
 
 class APIError(Exception):
-    """Deliberate API-layer failure with a stable code and status."""
+    """Deliberate API-layer failure with a stable code and status.
 
-    def __init__(self, status: int, code: str, message: str) -> None:
+    ``details`` carries optional structured diagnostics (e.g. the full
+    validation-error list for bundle validation failures) that surfaces in
+    job records — never in the client-facing HTTP error envelope, whose
+    shape stays frozen.
+    """
+
+    def __init__(
+        self,
+        status: int,
+        code: str,
+        message: str,
+        details: dict[str, object] | None = None,
+    ) -> None:
         super().__init__(message)
         self.status = status
         self.code = code
         self.message = message
+        self.details = details
 
 
 def envelope(status: int, code: str, message: str, request_id: str) -> JSONResponse:
@@ -48,7 +61,10 @@ def map_component_error(exc: Exception) -> APIError:
     from producer.exceptions import RegistryError, SearchError, ValidationFailure
 
     if isinstance(exc, ValidationFailure):
-        return APIError(409, "BUNDLE_VALIDATION_FAILED", str(exc))
+        details: dict[str, object] = {"validation_errors": exc.validation_errors}
+        if exc.staged_bundle:
+            details["staged_bundle"] = exc.staged_bundle
+        return APIError(409, "BUNDLE_VALIDATION_FAILED", str(exc), details=details)
     if isinstance(exc, (ARetrievalError, BRetrievalError)):
         return APIError(422, "INVALID_REQUEST", str(exc))
     if isinstance(exc, (ATimeoutError, BTimeoutError)):

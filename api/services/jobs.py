@@ -65,11 +65,14 @@ class JobManager:
             self._transition(job_id, status="succeeded", finished_at=_now(), result=result)
         except Exception as exc:  # jobs must never crash the pool
             api_error = map_component_error(exc)
+            error_payload: dict[str, Any] = {"code": api_error.code, "message": api_error.message}
+            if api_error.details:
+                error_payload.update(api_error.details)
             self._transition(
                 job_id,
                 status="failed",
                 finished_at=_now(),
-                error={"code": api_error.code, "message": api_error.message},
+                error=error_payload,
             )
         record = self.get(job_id)
         assert record is not None  # submitted moments ago in submit()
