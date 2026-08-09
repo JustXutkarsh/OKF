@@ -8,7 +8,7 @@ export interface ApiConfig {
 const STORAGE_KEY = "okf-api-config";
 
 export const DEFAULT_CONFIG: ApiConfig = {
-  baseUrl: "http://localhost:8000",
+  baseUrl: "https://okf-ijq7.onrender.com",
   apiKey: "",
 };
 
