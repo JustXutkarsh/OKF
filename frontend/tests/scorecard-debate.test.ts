@@ -12,7 +12,7 @@ const BRIEF: Briefing = {
     { document_id: "d2", section: "s", confidence: "mixed", matching_score: 0.5 },
   ] as never,
   sources: [
-    { document_id: "d1", document_title: "t", source_title: "t", source_url: "u", accessed_date: new Date().toISOString().slice(0, 10) },
+    { document_id: "d1", document_title: "t", source_title: "t", source_url: "u", accessed_date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10) },
   ] as never,
   retrieval: { candidate_count: 2, selected_count: 2, selected_documents: ["d1", "d2"], retrieval_time_ms: 1 },
   ranking: [],

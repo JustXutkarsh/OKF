@@ -7,7 +7,6 @@ import { useState } from "react";
 import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -45,11 +44,18 @@ export function UpdateKnowledge() {
 
   return (
     <div className="relative">
-      <Button variant="secondary" size="sm" onClick={() => setOpen((value) => !value)}>
-        <RefreshCw className={jobId && status !== "succeeded" && status !== "failed" ? "animate-spin" : ""} />
-        Update Knowledge
-        <ChevronDown className={open ? "rotate-180 transition-transform" : "transition-transform"} />
-      </Button>
+      <button
+        onClick={() => setOpen((value) => !value)}
+        className="flex items-center gap-1.5 rounded border border-border/50 bg-muted/30 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+      >
+        <RefreshCw
+          className={`size-3 ${jobId && status !== "succeeded" && status !== "failed" ? "animate-spin" : ""}`}
+        />
+        <span className="hidden sm:inline">SYNC BUNDLE</span>
+        <ChevronDown
+          className={`size-3 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
 
       <AnimatePresence>
         {open && (
@@ -60,8 +66,13 @@ export function UpdateKnowledge() {
             transition={{ duration: 0.15 }}
             className="absolute right-0 z-40 mt-2 w-80"
           >
-            <Card>
-              <CardContent className="space-y-3 p-4">
+            <div className="terminal-window rounded-xl border border-border/60 shadow-xl">
+              <div className="flex items-center gap-2 border-b border-border/40 px-4 py-2.5">
+                <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground/60">
+                  SYNC BUNDLE
+                </span>
+              </div>
+              <div className="space-y-3 p-4">
                 <p className="text-xs text-muted-foreground">
                   Queue a producer run for one tracked concept; the job runs asynchronously.
                 </p>
@@ -158,8 +169,8 @@ export function UpdateKnowledge() {
                     </Button>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

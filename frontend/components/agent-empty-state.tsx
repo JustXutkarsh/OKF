@@ -1,87 +1,138 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { RadarIcon, ScaleIcon } from "lucide-react";
-import { StaggerGroup, Reveal } from "@/components/reveal";
 
-/**
- * Pre-question idle state: introduce the two agents before any work starts,
- * so the first Ask already feels like tasking a team.
- */
-export function AgentEmptyState() {
+const BRIEFING_STREAMS = [
+  "Monitoring geopolitical event feeds…",
+  "Bundle index loaded. 0 active queries.",
+  "Standing by for mission dispatch.",
+];
+
+const CRITIC_STREAMS = [
+  "Critical analysis module initialized.",
+  "Assumption-detection engine armed.",
+  "Standing by for mission dispatch.",
+];
+
+function IdleTerminal({
+  callsign,
+  role,
+  Icon,
+  color,
+  streams,
+}: {
+  callsign: string;
+  role: string;
+  Icon: typeof RadarIcon;
+  color: string;
+  streams: string[];
+}) {
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-lg font-semibold tracking-tight">Ask a geopolitical question</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Two independent agents investigate the same auditable knowledge bundle in parallel.
+    <div
+      style={{ "--agent-color": color } as React.CSSProperties}
+      className="terminal-window flex min-h-[260px] flex-col rounded-xl border border-border/50 bg-card/60"
+    >
+      {/* Title bar */}
+      <div className="flex items-center gap-3 border-b border-border/50 px-4 py-2.5">
+        <div className="flex gap-1.5">
+          <span
+            className="status-dot"
+            style={{ backgroundColor: `hsl(${color})` }}
+          />
+          <span className="status-dot bg-yellow-500/30" />
+          <span className="status-dot bg-green-500/20" />
+        </div>
+        <p
+          className="flex-1 font-mono text-[11px] font-semibold uppercase tracking-[0.2em]"
+          style={{ color: `hsl(${color})` }}
+        >
+          {callsign}
+        </p>
+        <span className="shrink-0 rounded border border-border/40 bg-muted/20 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-muted-foreground/60">
+          STANDBY
+        </span>
+      </div>
+
+      {/* Meta row */}
+      <div className="flex items-center gap-2 border-b border-border/30 bg-muted/20 px-4 py-2">
+        <Icon className="size-3.5 shrink-0" style={{ color: `hsl(${color} / 0.7)` }} />
+        <p className="flex-1 font-mono text-[10px] text-muted-foreground/60 truncate">{role}</p>
+      </div>
+
+      {/* Console body (completely static — zero state updates, zero re-renders) */}
+      <div className="flex-1 p-4 space-y-2 overflow-hidden">
+        <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground/40 mb-3">
+          CONSOLE //
+        </p>
+        <div className="space-y-2">
+          {streams.map((line, i) => (
+            <div
+              key={`${i}-${line}`}
+              className="flex items-center gap-2 font-mono text-[11px]"
+            >
+              <span style={{ color: `hsl(${color} / 0.6)` }}>▸</span>
+              <span
+                style={{
+                  color:
+                    i === streams.length - 1
+                      ? `hsl(${color} / 0.85)`
+                      : "hsl(var(--muted-foreground) / 0.5)",
+                }}
+              >
+                {line}
+              </span>
+              {i === streams.length - 1 && (
+                <span
+                  className="terminal-cursor"
+                  style={{ "--agent-color": `hsl(${color})` } as React.CSSProperties}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="border-t border-border/30 px-4 py-2">
+        <p className="font-mono text-[9px] text-muted-foreground/40 tracking-widest">
+          AWAITING MISSION DISPATCH
         </p>
       </div>
-      <StaggerGroup className="grid gap-4 md:grid-cols-2">
-        <Reveal>
-          <div
-            className="glass rounded-2xl border p-5"
-            style={{ borderColor: "hsl(var(--agent-brief) / 0.3)" }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="flex size-10 items-center justify-center rounded-lg border"
-                style={{
-                  borderColor: "hsl(var(--agent-brief) / 0.4)",
-                  color: "hsl(var(--agent-brief))",
-                }}
-              >
-                <RadarIcon className="size-5" />
-              </div>
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                  AGENT://BRIEFING-01
-                </p>
-                <p className="text-sm font-semibold">Briefing Agent</p>
-              </div>
-            </div>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Provides grounded situation reports — current situation, key developments, key
-              actors — each claim traced to documents and sources.
-            </p>
-          </div>
-        </Reveal>
-        <Reveal>
-          <div
-            className="glass rounded-2xl border p-5"
-            style={{ borderColor: "hsl(var(--agent-analysis) / 0.3)" }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="flex size-10 items-center justify-center rounded-lg border"
-                style={{
-                  borderColor: "hsl(var(--agent-analysis) / 0.4)",
-                  color: "hsl(var(--agent-analysis))",
-                }}
-              >
-                <ScaleIcon className="size-5" />
-              </div>
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                  AGENT://CRITIC-02
-                </p>
-                <p className="text-sm font-semibold">Critical Analysis Agent</p>
-              </div>
-            </div>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Challenges assumptions and identifies uncertainty — conflicts, missing
-              information, and where the evidence is thin.
-            </p>
-          </div>
-        </Reveal>
-      </StaggerGroup>
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1, transition: { delay: 0.3 } }}
-        className="text-center font-mono text-xs text-muted-foreground/70"
-      >
-        ⌘ Both agents are standing by for your first question.
-      </motion.p>
+    </div>
+  );
+}
+
+export function AgentEmptyState() {
+  return (
+    <div className="space-y-4">
+      {/* Intro header */}
+      <div className="text-center">
+        <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground/50">
+          TWO ANALYSTS · ONE KNOWLEDGE BUNDLE · INDEPENDENT INVESTIGATION
+        </p>
+      </div>
+
+      {/* Agent terminals */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <IdleTerminal
+          callsign="AGENT://BRIEFING-01"
+          role="Situation synthesis from retrieved evidence"
+          Icon={RadarIcon}
+          color="var(--agent-brief)"
+          streams={BRIEFING_STREAMS}
+        />
+        <IdleTerminal
+          callsign="AGENT://CRITIC-02"
+          role="Assumption challenge · uncertainty mapping"
+          Icon={ScaleIcon}
+          color="var(--agent-analysis)"
+          streams={CRITIC_STREAMS}
+        />
+      </div>
+
+      <p className="text-center font-mono text-[10px] text-muted-foreground/40 tracking-widest">
+        ▸ DISPATCH A QUERY TO ACTIVATE BOTH AGENTS
+      </p>
     </div>
   );
 }

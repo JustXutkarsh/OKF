@@ -9,13 +9,10 @@ import type { QuestionParams } from "@/components/question-form";
 import { AgentPanel, type AgentIdentity } from "@/components/agent-panel";
 import { AnalysisContent } from "@/components/analysis-view";
 import { BriefingContent } from "@/components/briefing-view";
-import { DebateStream } from "@/components/debate-stream";
 import { EvidenceRadar } from "@/components/evidence-radar";
-import { OpsLog } from "@/components/ops-log";
+import { MissionTimeline } from "@/components/mission-timeline";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ErrorCard } from "@/components/section-card";
-import { Scorecard } from "@/components/scorecard";
-import { buildScorecard } from "@/lib/scorecard";
 
 export const BRIEFING_AGENT: AgentIdentity = {
   callsign: "AGENT://BRIEFING-01",
@@ -40,14 +37,14 @@ export const ANALYSIS_AGENT: AgentIdentity = {
   color: "var(--agent-analysis)",
   phases: [
     "Scanning retrieved documents…",
-    "Searching for assumptions…",
+    "Identifying assumptions…",
     "Cross-examining evidence…",
     "Identifying information gaps…",
     "Assessing confidence…",
   ],
 };
 
-/** The agent ops center: query conductor + two panels + ops log (debate lives in its own column). */
+/** Agent operations center: two agent terminals + mission timeline sidebar. */
 export function AgentOpsCenter({ params }: { params: QuestionParams }) {
   const brief = useQuery({
     queryKey: ["brief", params.question, params.maxDocs],
@@ -69,45 +66,49 @@ export function AgentOpsCenter({ params }: { params: QuestionParams }) {
     true
   );
 
+  const briefActive = briefLife.phase === "working";
+  const analyzeActive = analyzeLife.phase === "working";
+
   return (
-    <div className="space-y-4">
-      <OpsLog events={events} />
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_220px]">
+      {/* Agent BRIEFING-01 terminal */}
+      <AgentPanel agent={BRIEFING_AGENT} lifecycle={briefLife}>
+        {brief.isError && <ErrorCard error={brief.error} />}
+        {brief.isSuccess && (
+          <>
+            <div className="mb-4 rounded-lg border border-border/40 bg-background/30 p-3">
+              <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground/50">
+                EVIDENCE RADAR
+              </p>
+              <EvidenceRadar active={briefActive} documents={brief.data.documents_used} />
+            </div>
+            <ErrorBoundary scope="Briefing" route="/brief">
+              <BriefingContent data={brief.data} />
+            </ErrorBoundary>
+          </>
+        )}
+      </AgentPanel>
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        <AgentPanel agent={BRIEFING_AGENT} lifecycle={briefLife}>
-          {brief.isError && <ErrorCard error={brief.error} />}
-          {brief.isSuccess && (
-            <>
-              <div className="mb-4 rounded-lg border bg-background/40 p-3">
-                <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                  Evidence radar
-                </p>
-                <EvidenceRadar active={false} documents={brief.data.documents_used} />
-              </div>
-              <ErrorBoundary scope="Briefing" route="/brief">
-                <BriefingContent data={brief.data} />
-              </ErrorBoundary>
-            </>
-          )}
-        </AgentPanel>
+      {/* Agent CRITIC-02 terminal */}
+      <AgentPanel agent={ANALYSIS_AGENT} lifecycle={analyzeLife}>
+        {analyze.isError && <ErrorCard error={analyze.error} />}
+        {analyze.isSuccess && (
+          <>
+            <div className="mb-4 rounded-lg border border-border/40 bg-background/30 p-3">
+              <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground/50">
+                EVIDENCE RADAR
+              </p>
+              <EvidenceRadar active={analyzeActive} documents={analyze.data.documents_used} />
+            </div>
+            <ErrorBoundary scope="Critical analysis" route="/analyze">
+              <AnalysisContent data={analyze.data} />
+            </ErrorBoundary>
+          </>
+        )}
+      </AgentPanel>
 
-        <AgentPanel agent={ANALYSIS_AGENT} lifecycle={analyzeLife}>
-          {analyze.isError && <ErrorCard error={analyze.error} />}
-          {analyze.isSuccess && (
-            <>
-              <div className="mb-4 rounded-lg border bg-background/40 p-3">
-                <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                  Evidence radar
-                </p>
-                <EvidenceRadar active={false} documents={analyze.data.documents_used} />
-              </div>
-              <ErrorBoundary scope="Critical analysis" route="/analyze">
-                <AnalysisContent data={analyze.data} />
-              </ErrorBoundary>
-            </>
-          )}
-        </AgentPanel>
-      </div>
+      {/* Mission timeline sidebar */}
+      <MissionTimeline events={events} />
     </div>
   );
 }

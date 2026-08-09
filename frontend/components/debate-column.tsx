@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { motion } from "framer-motion";
 import { api } from "@/lib/api";
 import type { QuestionParams } from "@/components/question-form";
 import { DebateStream } from "@/components/debate-stream";
@@ -9,9 +10,8 @@ import { Scorecard } from "@/components/scorecard";
 import { buildScorecard } from "@/lib/scorecard";
 
 /**
- * Right-hand column: scorecard + debate stream. Reads the agent queries'
- * data from the shared React Query cache (same keys as the ops center, so
- * no duplicate backend calls).
+ * Debate column: intel confidence metrics + AI Debate Room.
+ * Reads from the shared React Query cache — no duplicate calls.
  */
 export function DebateColumn({ params }: { params: QuestionParams }) {
   const brief = useQuery({
@@ -31,19 +31,36 @@ export function DebateColumn({ params }: { params: QuestionParams }) {
 
   if (!ready) {
     return (
-      <div className="glass flex h-full min-h-[240px] flex-col items-center justify-center rounded-2xl border p-6 text-center">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-          Debate stream
+      <div className="terminal-window flex min-h-[280px] flex-col items-center justify-center rounded-xl p-6 text-center">
+        <motion.div
+          animate={{ opacity: [0.3, 0.8, 0.3] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="mb-3 font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground/40"
+        >
+          AI DEBATE ROOM
+        </motion.div>
+        <p className="font-mono text-[11px] text-muted-foreground/40">
+          Debate begins once both agents complete.
         </p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Agents are still investigating — the debate begins once both reports are in.
-        </p>
+        <div className="mt-4 flex gap-2">
+          <span
+            className="status-dot animate-signal-pulse"
+            style={{ backgroundColor: "hsl(var(--agent-brief) / 0.6)" }}
+          />
+          <span
+            className="status-dot animate-signal-pulse"
+            style={{
+              backgroundColor: "hsl(var(--agent-analysis) / 0.6)",
+              animationDelay: "0.3s",
+            }}
+          />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full min-h-[480px] flex-col gap-4">
+    <div className="flex h-full flex-col gap-4">
       {scorecard && <Scorecard data={scorecard} />}
       <div className="min-h-0 flex-1">
         <DebateStream briefing={brief.data} analysis={analyze.data} />

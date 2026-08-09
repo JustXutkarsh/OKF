@@ -2,27 +2,21 @@
 
 import type { Briefing } from "@/lib/types";
 import { ConfidenceViz } from "@/components/confidence-viz";
-import { EvidenceGallery } from "@/components/evidence-card";
-import { MetaFooter } from "@/components/meta-footer";
 import { Reveal, StaggerGroup } from "@/components/reveal";
 import { Typewriter } from "@/components/typewriter";
-import { ListSection, SectionCard } from "@/components/section-card";
-import { SourcesList } from "@/components/sources-list";
-import { FileText, Newspaper, Users } from "lucide-react";
+import { DossierSection, IntelItem } from "@/components/dossier-section";
 
 const NOT_COVERED = "This topic is not covered";
 
-/**
- * Evidence-first briefing report. Reveal order communicates method:
- * evidence before synthesis, sources always last. Sections stagger in;
- * the situation lead types into place.
- */
 export function BriefingContent({ data }: { data: Briefing }) {
   if (data.answer.current_situation.startsWith(NOT_COVERED)) {
     return (
-      <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-6 text-sm">
-        <p className="font-medium">{data.answer.current_situation}</p>
-        <p className="mt-1 text-muted-foreground">
+      <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-sm">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-amber-500/80 mb-2">
+          NO COVERAGE
+        </p>
+        <p className="text-foreground/80">{data.answer.current_situation}</p>
+        <p className="mt-2 text-xs text-muted-foreground/60">
           Try a topic covered by the bundle (conflicts, economics, actors, policy).
         </p>
       </div>
@@ -30,64 +24,87 @@ export function BriefingContent({ data }: { data: Briefing }) {
   }
 
   return (
-    <StaggerGroup className="grid gap-4">
+    <StaggerGroup className="space-y-4 max-w-3xl">
+      {/* Executive Summary */}
       <Reveal>
-        <SectionCard
-          title="Retrieved Evidence"
+        <DossierSection
+          title="EXECUTIVE SUMMARY"
+          classification="CLASSIFIED"
+          accentColor="hsl(var(--agent-brief))"
+        >
+          <div className="max-w-2xl text-[14px] leading-relaxed text-foreground/90">
+            <Typewriter text={data.answer.current_situation} />
+          </div>
+        </DossierSection>
+      </Reveal>
+
+      {/* Key Developments */}
+      <Reveal>
+        <DossierSection
+          title="KEY DEVELOPMENTS"
+          accentColor="hsl(var(--agent-brief) / 0.6)"
           action={
-            <span className="font-mono text-xs text-muted-foreground">
-              {data.evidence.length} fragments
+            <span className="font-mono text-[10px] text-muted-foreground/40">
+              {data.answer.key_developments.length} ITEMS
             </span>
           }
         >
-          <EvidenceGallery evidence={data.evidence} sources={data.sources} />
-        </SectionCard>
+          {data.answer.key_developments.length === 0 ? (
+            <p className="text-sm text-muted-foreground/60">None identified.</p>
+          ) : (
+            <div className="space-y-2.5">
+              {data.answer.key_developments.map((item, i) => (
+                <IntelItem
+                  key={i}
+                  index={i}
+                  text={item}
+                  color="hsl(var(--agent-brief) / 0.6)"
+                />
+              ))}
+            </div>
+          )}
+        </DossierSection>
       </Reveal>
 
+      {/* Key Actors */}
       <Reveal>
-        <SectionCard
-          title="Current Situation"
-          action={<FileText className="size-4 text-muted-foreground" />}
+        <DossierSection
+          title="KEY ACTORS"
+          classification="ACTORS"
+          accentColor="hsl(var(--terminal-cyan) / 0.5)"
+          action={
+            <span className="font-mono text-[10px] text-muted-foreground/40">
+              {data.answer.key_actors.length} ENTITIES
+            </span>
+          }
         >
-          <p className="text-[15px] leading-relaxed">
-            <Typewriter text={data.answer.current_situation} />
-          </p>
-        </SectionCard>
+          {data.answer.key_actors.length === 0 ? (
+            <p className="text-sm text-muted-foreground/60">None identified.</p>
+          ) : (
+            <div className="grid gap-2 sm:grid-cols-2">
+              {data.answer.key_actors.map((actor, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 rounded border border-border/40 bg-background/30 px-3 py-2 text-sm text-foreground/90"
+                >
+                  <span className="shrink-0 font-mono text-[10px] text-cyan-400">▸</span>
+                  <span className="font-mono text-xs font-medium">{actor}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </DossierSection>
       </Reveal>
 
+      {/* Threat Assessment */}
       <Reveal>
-        <div className="grid gap-4 md:grid-cols-2">
-          <SectionCard
-            title="Key Developments"
-            action={<Newspaper className="size-4 text-muted-foreground" />}
-          >
-            <ListSection items={data.answer.key_developments} />
-          </SectionCard>
-          <SectionCard title="Key Actors" action={<Users className="size-4 text-muted-foreground" />}>
-            <ListSection items={data.answer.key_actors} />
-          </SectionCard>
-        </div>
-      </Reveal>
-
-      <Reveal>
-        <SectionCard title="Confidence Breakdown">
+        <DossierSection
+          title="THREAT ASSESSMENT"
+          classification="RESTRICTED"
+          accentColor="hsl(var(--terminal-amber) / 0.5)"
+        >
           <ConfidenceViz evidence={data.evidence} />
-        </SectionCard>
-      </Reveal>
-
-      <Reveal>
-        <SectionCard title="Sources">
-          <SourcesList sources={data.sources} />
-        </SectionCard>
-      </Reveal>
-
-      <Reveal>
-        <MetaFooter
-          provider={data.provider}
-          model={data.model}
-          generatedAt={data.generated_at}
-          documentsUsed={data.documents_used}
-        />
+        </DossierSection>
       </Reveal>
     </StaggerGroup>
   );

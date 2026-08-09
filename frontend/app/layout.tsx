@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OKF Geopolitics Intelligence",
+  title: "OKF · Intelligence Operations Center",
   description:
-    "Cross-agent geopolitical intelligence: two independent AI agents sharing one auditable OKF knowledge bundle.",
+    "Two autonomous AI analysts investigate the same auditable intelligence bundle independently — then debate each other's findings.",
 };
 
 export default function RootLayout({

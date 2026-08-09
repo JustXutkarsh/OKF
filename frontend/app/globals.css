@@ -2,52 +2,79 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ═══════════════════════════════════════════════════════════════
+   OKF INTELLIGENCE OPERATIONS CENTER — Design System
+   Command center palette. Cinematic. Not a SaaS dashboard.
+   ═══════════════════════════════════════════════════════════════ */
+
 :root {
-  --background: 0 0% 100%;
-  --foreground: 222 47% 11%;
+  --background: 220 30% 97%;
+  --foreground: 220 40% 10%;
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --primary: 222 47% 28%;
+  --card-foreground: 220 40% 10%;
+  --primary: 220 60% 30%;
   --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 210 40% 94%;
-  --accent-foreground: 222 47% 11%;
+  --secondary: 210 30% 93%;
+  --secondary-foreground: 220 40% 10%;
+  --muted: 210 30% 93%;
+  --muted-foreground: 215 20% 45%;
+  --accent: 210 30% 90%;
+  --accent-foreground: 220 40% 10%;
   --destructive: 0 72% 51%;
   --destructive-foreground: 210 40% 98%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 222 47% 40%;
-  --radius: 0.625rem;
-  /* Agent identity accents */
-  --agent-brief: 164 86% 45%;
-  --agent-analysis: 20 90% 60%;
+  --border: 214 25% 85%;
+  --input: 214 25% 85%;
+  --ring: 220 60% 40%;
+  --radius: 0.5rem;
+
+  /* Agent identity */
+  --agent-brief: 164 86% 40%;
+  --agent-analysis: 20 90% 55%;
   --signal: 164 86% 40%;
+
+  /* Terminal colors (light mode: muted) */
+  --terminal-green: 142 76% 36%;
+  --terminal-amber: 38 92% 50%;
+  --terminal-red: 0 72% 51%;
+  --terminal-cyan: 192 91% 36%;
+  --scanline-opacity: 0;
+  --grid-opacity: 0.04;
+  --glow-intensity: 0.3;
 }
 
 .dark {
-  --background: 224 47% 6%;
-  --foreground: 210 40% 96%;
-  --card: 224 44% 9%;
-  --card-foreground: 210 40% 96%;
-  --primary: 210 40% 96%;
-  --primary-foreground: 222 47% 11%;
-  --secondary: 223 38% 14%;
-  --secondary-foreground: 210 40% 96%;
-  --muted: 223 38% 14%;
-  --muted-foreground: 215 20% 65%;
-  --accent: 223 38% 16%;
-  --accent-foreground: 210 40% 96%;
+  /* Deep command-center navy — near black with blue undertone */
+  --background: 224 50% 4%;
+  --foreground: 210 40% 92%;
+  --card: 224 45% 7%;
+  --card-foreground: 210 40% 92%;
+  --primary: 210 40% 88%;
+  --primary-foreground: 224 50% 4%;
+  --secondary: 223 40% 11%;
+  --secondary-foreground: 210 40% 92%;
+  --muted: 223 40% 11%;
+  --muted-foreground: 215 20% 55%;
+  --accent: 223 40% 13%;
+  --accent-foreground: 210 40% 92%;
   --destructive: 0 63% 45%;
   --destructive-foreground: 210 40% 98%;
-  --border: 223 38% 16%;
-  --input: 223 38% 20%;
-  --ring: 215 30% 55%;
-  --agent-brief: 164 86% 55%;
-  --agent-analysis: 23 92% 64%;
-  --signal: 164 86% 50%;
+  --border: 223 35% 13%;
+  --input: 223 35% 16%;
+  --ring: 215 30% 50%;
+
+  /* Agent identity — brighter in dark */
+  --agent-brief: 164 86% 52%;
+  --agent-analysis: 23 92% 62%;
+  --signal: 164 86% 48%;
+
+  /* Terminal colors */
+  --terminal-green: 142 76% 55%;
+  --terminal-amber: 38 92% 65%;
+  --terminal-red: 0 72% 60%;
+  --terminal-cyan: 192 91% 55%;
+  --scanline-opacity: 0.025;
+  --grid-opacity: 0.055;
+  --glow-intensity: 0.6;
 }
 
 @theme inline {
@@ -81,25 +108,61 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Research-lab atmosphere: a faint analytical grid behind everything. */
+/* ─── Ambient war-room grid ──────────────────────────────────── */
+.ops-grid {
+  background-image:
+    radial-gradient(ellipse 70% 40% at 50% -10%,
+      hsl(var(--agent-brief) / 0.07) 0%,
+      transparent 70%),
+    linear-gradient(hsl(var(--foreground) / var(--grid-opacity)) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--foreground) / var(--grid-opacity)) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    40px 40px,
+    40px 40px;
+}
+
+/* ─── Legacy alias ───────────────────────────────────────────── */
 .lab-grid {
   background-image:
     radial-gradient(ellipse 80% 50% at 50% -20%, hsl(var(--signal) / 0.05), transparent),
     linear-gradient(hsl(var(--foreground) / 0.028) 1px, transparent 1px),
     linear-gradient(90deg, hsl(var(--foreground) / 0.028) 1px, transparent 1px);
-  background-size:
-    100% 100%,
-    32px 32px,
-    32px 32px;
+  background-size: 100% 100%, 32px 32px, 32px 32px;
 }
 
-/* Glass panel used by agent workspaces. */
+/* ─── Glass panel ────────────────────────────────────────────── */
 .glass {
   background-color: hsl(var(--card) / 0.6);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
 }
 
-/* Agent identity accents — per-agent, set via inline custom property. */
+/* ─── Terminal window aesthetic ─────────────────────────────── */
+.terminal-window {
+  background-color: hsl(var(--card) / 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid hsl(var(--border));
+  position: relative;
+  overflow: hidden;
+}
+
+/* Scanlines overlay — visible only in dark, respects reduced-motion */
+.terminal-window::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    hsl(0 0% 0% / var(--scanline-opacity)) 3px,
+    hsl(0 0% 0% / var(--scanline-opacity)) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Agent accent utilities ─────────────────────────────────── */
 .agent-accent {
   color: hsl(var(--agent-color));
 }
@@ -110,7 +173,7 @@ body {
   border-color: hsl(var(--agent-color) / 0.35);
 }
 .agent-glow {
-  box-shadow: 0 0 24px -8px hsl(var(--agent-color) / 0.5);
+  box-shadow: 0 0 28px -6px hsl(var(--agent-color) / calc(var(--glow-intensity) * 0.9));
 }
 .agent-chip {
   background-color: hsl(var(--agent-color) / 0.1);
@@ -118,22 +181,125 @@ body {
   color: hsl(var(--agent-color));
 }
 
-/* Blinking caret for the typewriter. */
+/* Glow utilities */
+.glow-brief {
+  box-shadow: 0 0 32px -8px hsl(var(--agent-brief) / calc(var(--glow-intensity)));
+}
+.glow-critic {
+  box-shadow: 0 0 32px -8px hsl(var(--agent-analysis) / calc(var(--glow-intensity)));
+}
+.glow-green {
+  box-shadow: 0 0 20px -6px hsl(var(--terminal-green) / 0.6);
+}
+
+/* ─── Status dot ─────────────────────────────────────────────── */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ─── Blinking terminal cursor ───────────────────────────────── */
 .caret::after {
   content: "▍";
   margin-left: 1px;
   color: hsl(var(--foreground) / 0.55);
   animation: caret-blink 1s steps(2, start) infinite;
 }
-@keyframes caret-blink {
-  to {
-    visibility: hidden;
-  }
+
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background-color: hsl(var(--agent-color, var(--terminal-green)));
+  animation: caret-blink 1s steps(2, start) infinite;
+  vertical-align: middle;
+  margin-left: 2px;
 }
 
-/* Respect reduced motion globally for our custom CSS anims. */
+/* ─── Animations ─────────────────────────────────────────────── */
+@keyframes caret-blink {
+  to { visibility: hidden; }
+}
+
+@keyframes signal-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes radar-ping {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes mission-flash {
+  0% { opacity: 0; transform: scale(0.96); }
+  20% { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes data-stream {
+  0% { transform: translateY(-8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* ─── Utility classes ────────────────────────────────────────── */
+.animate-signal-pulse {
+  animation: signal-pulse 1.8s ease-in-out infinite;
+}
+
+.animate-radar-sweep {
+  animation: radar-sweep 2.4s linear infinite;
+}
+
+.animate-radar-ping {
+  animation: radar-ping 1.5s ease-out infinite;
+}
+
+.animate-data-stream {
+  animation: data-stream 0.3s ease-out forwards;
+}
+
+/* Pipeline step states */
+.pipeline-step-done {
+  color: hsl(var(--terminal-green));
+}
+.pipeline-step-active {
+  color: hsl(var(--agent-color));
+}
+.pipeline-step-pending {
+  color: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Mission timeline entries */
+.timeline-entry {
+  animation: data-stream 0.25s ease-out forwards;
+}
+
+/* ─── Prefers-reduced-motion overrides ───────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .caret::after {
+  .caret::after,
+  .terminal-cursor {
     animation: none;
+  }
+  .animate-signal-pulse,
+  .animate-radar-sweep,
+  .animate-radar-ping,
+  .animate-data-stream {
+    animation: none;
+  }
+  .terminal-cursor {
+    opacity: 1;
   }
 }
