@@ -14,9 +14,11 @@ export const DEFAULT_CONFIG: ApiConfig = {
 
 export function loadConfig(): ApiConfig {
   if (typeof window === "undefined") return DEFAULT_CONFIG;
+
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_CONFIG;
+
     const parsed = JSON.parse(raw) as Partial<ApiConfig>;
     return { ...DEFAULT_CONFIG, ...parsed };
   } catch {
