@@ -32,21 +32,23 @@ function getTypeColor(type: string): string {
 }
 
 function layoutGraph(
-  graph: KnowledgeGraph,
+  graph: KnowledgeGraph | null | undefined,
   isDark: boolean
 ): { nodes: Node[]; edges: Edge[] } {
+  const rawNodes = graph?.nodes ?? [];
+  const rawEdges = graph?.edges ?? [];
   const groups = new Map<string, number>();
-  graph.nodes.forEach((n) => {
+  rawNodes.forEach((n) => {
     if (!groups.has(n.type)) groups.set(n.type, groups.size);
   });
   const byType = [...groups.keys()];
   const center = { x: 240, y: 160 };
   const nodes: Node[] = [];
 
-  const orbitRadius = Math.max(80, graph.nodes.length * 10);
-  graph.nodes.forEach((n, i) => {
+  const orbitRadius = Math.max(80, rawNodes.length * 10);
+  rawNodes.forEach((n, i) => {
     const typeIdx = byType.indexOf(n.type);
-    const angle = (i / graph.nodes.length) * Math.PI * 2;
+    const angle = (i / (rawNodes.length || 1)) * Math.PI * 2;
     const jitter = (i % 3) * 12;
     const x = center.x + Math.cos(angle) * (orbitRadius + jitter);
     const y = center.y + Math.sin(angle) * (orbitRadius + jitter) + typeIdx * 4;
@@ -70,7 +72,7 @@ function layoutGraph(
   });
 
   const edgeColor = isDark ? "hsl(215 20% 40%)" : "hsl(214 32% 75%)";
-  const edges: Edge[] = graph.edges.map((e, i) => ({
+  const edges: Edge[] = rawEdges.map((e, i) => ({
     id: e.id || `edge-${i}`,
     source: e.source,
     target: e.target,
@@ -123,7 +125,7 @@ export function KnowledgeGraphPanel() {
   }, [nodes, edges, setNodes, setEdges]);
 
   // Type legend
-  const typeSet = new Set(query.data?.nodes.map((n) => n.type) ?? []);
+  const typeSet = new Set(query.data?.nodes?.map((n) => n.type) ?? []);
   const legendTypes = [...typeSet].slice(0, 5);
 
   return (
@@ -142,7 +144,7 @@ export function KnowledgeGraphPanel() {
         </p>
         {query.data && (
           <p className="font-mono text-[9px] text-muted-foreground/40">
-            {query.data.nodes.length} NODES · {query.data.edges.length} EDGES
+            {query.data.nodes?.length ?? 0} NODES · {query.data.edges?.length ?? 0} EDGES
           </p>
         )}
       </div>

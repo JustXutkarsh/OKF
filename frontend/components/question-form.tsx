@@ -51,6 +51,7 @@ export function QuestionForm({
             <span className="shrink-0 font-mono text-[11px] text-muted-foreground/60 select-none">
               QUERY://
             </span>
+            <label htmlFor="question" className="sr-only">Geopolitical Question</label>
             <input
               id="question"
               placeholder="Enter geopolitical intelligence query…"
@@ -87,6 +88,7 @@ export function QuestionForm({
           {/* Submit */}
           <motion.button
             type="submit"
+            aria-label="Ask"
             disabled={loading}
             whileTap={{ scale: 0.97 }}
             className="flex items-center gap-2 rounded-lg border border-border/60 bg-foreground/5 px-4 py-2.5 font-mono text-[11px] uppercase tracking-widest text-foreground transition-all hover:bg-foreground/10 disabled:opacity-50"

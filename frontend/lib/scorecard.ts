@@ -54,9 +54,14 @@ export function buildScorecard(brief: Briefing, analysis: Analysis): Scorecard {
   const dates = [...brief.sources, ...analysis.sources]
     .map((s) => s.accessed_date)
     .filter((d): d is string => !!d && !Number.isNaN(Date.parse(d)));
-  const latestMs = dates.length ? Math.max(...dates.map((d) => Date.parse(d))) : null;
+  const toUtcMidnight = (dStr: string) => {
+    const d = new Date(dStr);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  };
+  const latestMs = dates.length ? Math.max(...dates.map(toUtcMidnight)) : null;
+  const todayMs = toUtcMidnight(new Date().toISOString());
   const freshnessDays =
-    latestMs === null ? -1 : Math.max(0, Math.round((Date.now() - latestMs) / 86_400_000));
+    latestMs === null ? -1 : Math.max(0, Math.round((todayMs - latestMs) / 86_400_000));
 
   return {
     confidence,

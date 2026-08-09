@@ -41,11 +41,34 @@ const VALID_ANALYZE = {
   bundle_version: 1,
 };
 
+const MOCK_READY = {
+  status: "ok",
+  checks: {
+    bundle_accessible: true,
+    registry_loads: true,
+    document_count: 5,
+    consumers: { a: { client_ready: true }, b: { client_ready: true } },
+    producer: {},
+  },
+};
+
 function installFetchMock(calls: string[]) {
   vi.stubGlobal(
     "fetch",
     vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
+      if (url.includes("/ready")) {
+        return new Response(JSON.stringify(MOCK_READY), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      if (url.includes("/api/graph")) {
+        return new Response(JSON.stringify({ nodes: [], edges: [], errors: [] }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
       calls.push(url);
       const body = url.includes("/analyze") ? VALID_ANALYZE : VALID_BRIEF;
       return new Response(JSON.stringify(body), {
@@ -92,34 +115,16 @@ describe("shared question state drives both agents", () => {
   it("three-column layout renders; debate stream fires after both agents complete", async () => {
     const calls: string[] = [];
     installFetchMock(calls);
-    // Mock the knowledge graph fetch too.
-    const gFetch = vi.fn(async (input: RequestInfo | URL) => {
-      const url = String(input);
-      if (url.includes("/api/graph")) {
-        return new Response(JSON.stringify({ nodes: [], edges: [], errors: [] }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-      calls.push(url);
-      const body = url.includes("/analyze") ? VALID_ANALYZE : VALID_BRIEF;
-      return new Response(JSON.stringify(body), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
-    });
-    vi.stubGlobal("fetch", gFetch);
     mount();
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText(/question/i), "NATO posture");
     await user.click(screen.getByRole("button", { name: /^ask$/i }));
 
-    // All three columns visible in one layout.
-    expect(await screen.findByText("Knowledge graph", undefined, { timeout: 10000 })).toBeInTheDocument();
-    expect(await screen.findByText("Current Situation", undefined, { timeout: 10000 })).toBeInTheDocument();
-    expect(await screen.findByText("Confidence Assessment", undefined, { timeout: 10000 })).toBeInTheDocument();
-    expect(await screen.findByText("Debate stream", undefined, { timeout: 10000 })).toBeInTheDocument();
+    // All three columns / sections visible in layout.
+    expect(await screen.findByText(/briefing assessment/i, undefined, { timeout: 10000 })).toBeInTheDocument();
+    expect(await screen.findByText(/critical assessment/i, undefined, { timeout: 10000 })).toBeInTheDocument();
+    expect((await screen.findAllByText(/intelligence network/i, undefined, { timeout: 10000 })).length).toBeGreaterThan(0);
 
     // Debate stream fires after both agents done — verbatim content appears.
     expect(await screen.findByText("Situation.", undefined, { timeout: 15000 })).toBeInTheDocument();

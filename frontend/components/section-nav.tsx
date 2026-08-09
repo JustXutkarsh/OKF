@@ -28,7 +28,7 @@ export function SectionNav({ activeId }: { activeId?: string }) {
       (el): el is HTMLElement => el !== null
     );
 
-    if (sectionElements.length === 0) return;
+    if (sectionElements.length === 0 || typeof IntersectionObserver === "undefined") return;
 
     const observer = new IntersectionObserver(
       (entries) => {
