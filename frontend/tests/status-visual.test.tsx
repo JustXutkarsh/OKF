@@ -34,3 +34,18 @@ describe("confidenceProfile", () => {
     expect(confidenceProfile([])).toEqual({ verified: 0, mixed: 0, unverified: 0 });
   });
 });
+
+describe("API readiness status evaluation", () => {
+  const isApiOnline = (status?: string) => status === "ready" || status === "ok";
+
+  it("evaluates both 'ready' (Render backend) and 'ok' (health endpoint) as online", () => {
+    expect(isApiOnline("ready")).toBe(true);
+    expect(isApiOnline("ok")).toBe(true);
+  });
+
+  it("evaluates 'not_ready', error, or undefined status as offline", () => {
+    expect(isApiOnline("not_ready")).toBe(false);
+    expect(isApiOnline("error")).toBe(false);
+    expect(isApiOnline(undefined)).toBe(false);
+  });
+});

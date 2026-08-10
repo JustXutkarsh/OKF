@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Loader2, PlugZap, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -39,6 +39,7 @@ function StatusRow({ label, ok, detail }: { label: string; ok: boolean; detail?:
 }
 
 export default function SettingsPage() {
+  const queryClient = useQueryClient();
   const {
     register,
     handleSubmit,
@@ -78,6 +79,13 @@ export default function SettingsPage() {
     setTestState(ok ? "ok" : "error");
   }
 
+  function handleSave(values: SettingsForm) {
+    saveConfig(values);
+    reset(values);
+    queryClient.invalidateQueries({ queryKey: ["ready"] });
+    queryClient.invalidateQueries({ queryKey: ["version"] });
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <TopNav />
@@ -90,7 +98,7 @@ export default function SettingsPage() {
         </div>
 
         <form
-          onSubmit={handleSubmit((values) => saveConfig(values))}
+          onSubmit={handleSubmit(handleSave)}
           className="space-y-4"
         >
           <Card>
@@ -156,7 +164,11 @@ export default function SettingsPage() {
             {ready.isPending && <Loader2 className="size-4 animate-spin" />}
             {ready.data && (
               <>
-                <StatusRow label="Overall" ok={ready.data.status === "ready"} detail={ready.data.status} />
+                <StatusRow
+                  label="Overall"
+                  ok={ready.data.status === "ready" || ready.data.status === "ok"}
+                  detail={ready.data.status}
+                />
                 <StatusRow label="Bundle accessible" ok={ready.data.checks.bundle_accessible} />
                 <StatusRow label="Producer registry" ok={ready.data.checks.registry_loads} />
                 <StatusRow

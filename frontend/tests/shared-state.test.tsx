@@ -42,7 +42,7 @@ const VALID_ANALYZE = {
 };
 
 const MOCK_READY = {
-  status: "ok",
+  status: "ready",
   checks: {
     bundle_accessible: true,
     registry_loads: true,

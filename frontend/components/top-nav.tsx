@@ -43,7 +43,8 @@ function SystemStatusBar() {
     retry: false,
   });
 
-  const apiOnline = ready.isSuccess && ready.data.status === "ok";
+  const apiOnline =
+    ready.isSuccess && (ready.data.status === "ready" || ready.data.status === "ok");
   const bundleReady = ready.isSuccess && ready.data.checks.bundle_accessible;
   const consumerCount = ready.isSuccess
     ? Object.values(ready.data.checks.consumers).filter((c) => c.client_ready).length
@@ -60,14 +61,20 @@ function SystemStatusBar() {
       id: "bundle",
       label: bundleReady
         ? `BUNDLE v${version.data?.bundle_version ?? "?"} READY`
-        : "BUNDLE LOADING",
+        : ready.isPending
+          ? "BUNDLE CHECKING"
+          : "BUNDLE UNREADABLE",
       live: bundleReady || ready.isPending,
-      color: bundleReady ? "hsl(var(--terminal-green))" : "hsl(var(--terminal-amber))",
+      color: bundleReady
+        ? "hsl(var(--terminal-green))"
+        : ready.isPending
+          ? "hsl(var(--terminal-amber))"
+          : "hsl(var(--terminal-red))",
     },
     {
       id: "api",
-      label: apiOnline ? "API ONLINE" : ready.isPending ? "API CONNECTING" : "API OFFLINE",
-      live: apiOnline,
+      label: ready.isPending ? "API CONNECTING" : apiOnline ? "API ONLINE" : "API OFFLINE",
+      live: apiOnline || ready.isPending,
       color: apiOnline
         ? "hsl(var(--terminal-green))"
         : ready.isPending
