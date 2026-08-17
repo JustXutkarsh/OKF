@@ -321,9 +321,29 @@ class EndpointTests(unittest.TestCase):
             broken = replace(registry.get("briefing"), client_error="GROQ_API_KEY is not set")
             registry._by_name["briefing"] = broken
             r = client.get("/api/v1/ready")
+            # /health remains 200 OK because the backend process is healthy
+            health_r = client.get("/api/v1/health")
+        self.assertEqual(health_r.status_code, 200)
+        self.assertEqual(health_r.json(), {"status": "ok"})
         self.assertEqual(r.status_code, 503)
         self.assertEqual(r.json()["status"], "not_ready")
         self.assertFalse(r.json()["checks"]["consumers"]["briefing"]["client_ready"])
+        self.assertTrue(r.json()["checks"]["consumers"]["analysis"]["client_ready"])
+
+    def test_successful_openai_critic_when_groq_fails(self) -> None:
+        with api_client() as (client, app):
+            install_fakes(app)
+            registry = app.state.registry
+            broken = replace(registry.get("briefing"), client_error="GROQ_API_KEY is not set")
+            registry._by_name["briefing"] = broken
+            # Analyze (CRITIC-02 / OpenAI) succeeds independently
+            r = client.post(
+                "/api/v1/analyze",
+                json={"question": "Taiwan security"},
+                headers={"Authorization": "Bearer test-key"},
+            )
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("critical_analysis", r.json())
 
 
 class ErrorMappingTests(unittest.TestCase):

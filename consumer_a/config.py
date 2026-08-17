@@ -45,7 +45,7 @@ LLM_PROVIDERS: dict[str, dict[str, str | None]] = {
         "base_url": "https://api.groq.com/openai/v1",
         "key_env": ENV_GROQ_KEY,
         "key_attr": "groq_api_key",
-        "default_model": "llama-3.3-70b-versatile",
+        "default_model": "openai/gpt-oss-120b",
     },
     "openai": {
         "base_url": None,

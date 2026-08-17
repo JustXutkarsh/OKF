@@ -36,16 +36,29 @@ describe("confidenceProfile", () => {
 });
 
 describe("API readiness status evaluation", () => {
-  const isApiOnline = (status?: string) => status === "ready" || status === "ok";
+  const isApiOnline = (status?: string) =>
+    status === "ready" || status === "ok" || status === "degraded";
 
-  it("evaluates both 'ready' (Render backend) and 'ok' (health endpoint) as online", () => {
+  it("evaluates 'ready', 'ok', and 'degraded' as online", () => {
     expect(isApiOnline("ready")).toBe(true);
     expect(isApiOnline("ok")).toBe(true);
+    expect(isApiOnline("degraded")).toBe(true);
   });
 
   it("evaluates 'not_ready', error, or undefined status as offline", () => {
     expect(isApiOnline("not_ready")).toBe(false);
     expect(isApiOnline("error")).toBe(false);
     expect(isApiOnline(undefined)).toBe(false);
+  });
+
+  it("evaluates active consumers when one provider is degraded", () => {
+    const consumers = {
+      briefing: { provider: "groq", model: "openai/gpt-oss-120b", client_ready: false, error: "404" },
+      analysis: { provider: "openai", model: "gpt-5.4-mini", client_ready: true },
+    };
+    const activeCount = Object.values(consumers).filter((c) => c.client_ready).length;
+    expect(activeCount).toBe(1);
+    expect(consumers.analysis.client_ready).toBe(true);
+    expect(consumers.briefing.client_ready).toBe(false);
   });
 });

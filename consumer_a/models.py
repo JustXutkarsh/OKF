@@ -12,7 +12,7 @@ class ConsumerConfig(BaseModel):
 
     bundle_path: Path
     provider: str = "groq"
-    model: str = "llama-3.3-70b-versatile"
+    model: str = "openai/gpt-oss-120b"
     max_docs: int = 3
     request_timeout: int = 30
     log_level: str = "INFO"

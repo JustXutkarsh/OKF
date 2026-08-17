@@ -21,9 +21,21 @@ PHRASE_WEIGHT = 5
 
 STOPWORDS = frozenset(
     "a an the and or of in on to for is are was were be been being it its as at "
-    "by from with about between what how why when who whom which whose does do "
-    "did will would can could should has have had this that these those current "
-    "latest recent now today tell me give explain".split()
+    "by from with about between into over through under above below across against "
+    "what how why when who whom which whose does do did will would can could should "
+    "has have had this that these those current latest recent now today tell me give "
+    "explain describe compare main major strategic economic associated actors ability "
+    "influence risk risks affect affects effect effects impact impacts situation "
+    "overview dynamics factors factor implications implication role roles status "
+    "tensions tension disruption disruptions dispute disputes disputed".split()
+)
+
+# Common geographic, military, and institutional descriptors that frequently collide
+# across clusters when separated from their core named entities.
+MODIFIERS = frozenset(
+    "strait sea gulf bay canal corridor channel river mountain pass sector island islands "
+    "forces military command fleet defense security operations frontline border "
+    "treaty agreement convention resolution accord policy doctrine supply chain chains".split()
 )
 
 _TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
@@ -33,6 +45,12 @@ def tokenize(text: str) -> list[str]:
     """Lowercase word tokens without stopwords (question or field text)."""
 
     return [t for t in _TOKEN_PATTERN.findall(text.lower()) if t not in STOPWORDS]
+
+
+def _raw_tokens(text: str) -> list[str]:
+    """All lowercase alphanumeric tokens without stopword stripping."""
+
+    return _TOKEN_PATTERN.findall(text.lower())
 
 
 def _normalized(text: str) -> str:
@@ -67,13 +85,37 @@ def resource_score(question_tokens: list[str], entry: CatalogEntry) -> int:
 
 
 def phrase_bonus(question: str, entry: CatalogEntry) -> int:
-    """Bonus when any adjacent question-token bigram appears in the title."""
+    """Bonus when adjacent question-token bigrams appear in title, id, or tags."""
 
-    title_text = _normalized(entry.title)
-    tokens = tokenize(question)
-    for first, second in zip(tokens, tokens[1:]):
-        if f"{first} {second}" in title_text:
+    q_toks = tokenize(question)
+    if len(q_toks) < 2:
+        return 0
+
+    # 1. Check adjacent question tokens in tokenized title, id, or tags
+    for first, second in zip(q_toks, q_toks[1:]):
+        t_toks = tokenize(entry.title)
+        for i in range(len(t_toks) - 1):
+            if t_toks[i] == first and t_toks[i + 1] == second:
+                return PHRASE_WEIGHT
+
+        id_toks = tokenize(entry.id)
+        for i in range(len(id_toks) - 1):
+            if id_toks[i] == first and id_toks[i + 1] == second:
+                return PHRASE_WEIGHT
+
+        for tag in entry.tags:
+            tag_t = tokenize(tag)
+            for i in range(len(tag_t) - 1):
+                if tag_t[i] == first and tag_t[i + 1] == second:
+                    return PHRASE_WEIGHT
+
+    # 2. Check contiguous raw bigrams in raw title text (handles stopwords like "of")
+    t_raw = " ".join(_raw_tokens(entry.title))
+    for i in range(len(q_toks) - 1):
+        bigram = f"{q_toks[i]} {q_toks[i + 1]}"
+        if bigram in t_raw or bigram in entry.id:
             return PHRASE_WEIGHT
+
     return 0
 
 
@@ -91,7 +133,7 @@ def total_score(question: str, entry: CatalogEntry) -> int:
 
 
 def select(catalog: list[CatalogEntry], question: str, max_docs: int) -> RetrievalResult:
-    """Score the catalog, rank deterministically, return selection + ranking."""
+    """Score the catalog, rank deterministically, return precision selection + ranking."""
 
     tokens = tokenize(question)
     rows: list[tuple[CatalogEntry, RankingEntry]] = []
@@ -101,8 +143,22 @@ def select(catalog: list[CatalogEntry], question: str, max_docs: int) -> Retriev
         ident = id_score(tokens, entry)
         resource = resource_score(tokens, entry)
         phrase = phrase_bonus(question, entry)
-        total = title + tags + ident + resource + phrase
-        if total > 0:
+
+        base_total = title + tags + ident + resource + phrase
+        if base_total > 0:
+            all_matched = (
+                (set(tokens) & set(tokenize(entry.title)))
+                | (set(tokens) & {token for tag in entry.tags for token in tokenize(tag)})
+                | (set(tokens) & set(tokenize(entry.id)))
+                | (set(tokens) & set(tokenize(entry.resource)))
+            )
+            distinctive = [t for t in all_matched if t not in MODIFIERS]
+            entity_bonus = 10 if distinctive else 0
+            breadth_bonus = (
+                4 * (len(all_matched) - 1) if len(all_matched) > 1 and distinctive else 0
+            )
+
+            total = base_total + entity_bonus + breadth_bonus
             rows.append(
                 (
                     entry,
@@ -112,14 +168,23 @@ def select(catalog: list[CatalogEntry], question: str, max_docs: int) -> Retriev
                         tag_score=tags,
                         id_score=ident,
                         resource_score=resource,
-                        phrase_bonus=phrase,
+                        phrase_bonus=phrase + entity_bonus + breadth_bonus,
                         total_score=total,
                     ),
                 )
             )
+
     rows.sort(key=lambda item: (-item[1].total_score, item[1].document_id))
+
+    if not rows:
+        return RetrievalResult(candidate_count=len(catalog), selected=[], ranking=[])
+
+    top_score = rows[0][1].total_score
+    cutoff = max(4, int(top_score * 0.35)) if top_score >= 10 else 1
+    selected_docs = [entry for entry, rank in rows if rank.total_score >= cutoff][:max_docs]
+
     return RetrievalResult(
         candidate_count=len(catalog),
-        selected=[entry for entry, _ in rows[:max_docs]],
+        selected=selected_docs,
         ranking=[rank for _, rank in rows],
     )

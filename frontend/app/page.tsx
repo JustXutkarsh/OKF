@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AgentEmptyState } from "@/components/agent-empty-state";
 import { AgentPanel, BRIEFING_AGENT, ANALYSIS_AGENT } from "@/components/agent-panel";
 import { BriefingContent } from "@/components/briefing-view";
@@ -261,6 +261,7 @@ function MissionResults({ params }: { params: QuestionParams }) {
 }
 
 export default function HomePage() {
+  const queryClient = useQueryClient();
   const [params, setParams] = useState<QuestionParams | null>(null);
   const [missionFlash, setMissionFlash] = useState(false);
 
@@ -268,6 +269,8 @@ export default function HomePage() {
     setParams(p);
     setMissionFlash(true);
     setTimeout(() => setMissionFlash(false), 1200);
+    queryClient.invalidateQueries({ queryKey: ["ready"] });
+    queryClient.invalidateQueries({ queryKey: ["version"] });
   }
 
   return (

@@ -33,60 +33,106 @@ function SystemStatusBar() {
   const ready = useQuery({
     queryKey: ["ready"],
     queryFn: () => api.getReady(),
-    refetchInterval: 30_000,
-    retry: false,
+    refetchInterval: 15_000,
+    retry: 1,
   });
   const version = useQuery({
     queryKey: ["version"],
     queryFn: () => api.getVersion(),
-    staleTime: 60_000,
-    retry: false,
+    staleTime: 30_000,
+    retry: 1,
   });
 
-  const apiOnline =
-    ready.isSuccess && (ready.data.status === "ready" || ready.data.status === "ok");
-  const bundleReady = ready.isSuccess && ready.data.checks.bundle_accessible;
-  const consumerCount = ready.isSuccess
-    ? Object.values(ready.data.checks.consumers).filter((c) => c.client_ready).length
-    : 0;
+  const backendReachable = ready.isSuccess || version.isSuccess;
+  const isConnecting = ready.isPending && version.isPending;
+
+  const consumers = ready.data?.checks?.consumers ?? {};
+  const briefingInfo = consumers["briefing"];
+  const analysisInfo = consumers["analysis"];
+  const briefingReady = briefingInfo?.client_ready ?? false;
+  const criticReady = analysisInfo?.client_ready ?? false;
+  const activeAgentCount = (briefingReady ? 1 : 0) + (criticReady ? 1 : 0);
+
+  const isDegraded = ready.isSuccess && ready.data.status === "degraded";
+  const bundleReady =
+    (ready.isSuccess && ready.data.checks.bundle_accessible) ||
+    (version.isSuccess && version.data?.bundle_version !== undefined);
+
+  let apiLabel = "API OFFLINE";
+  let apiColor = "hsl(var(--terminal-red))";
+  if (isConnecting) {
+    apiLabel = "API CONNECTING";
+    apiColor = "hsl(var(--terminal-amber))";
+  } else if (backendReachable) {
+    if (isDegraded) {
+      apiLabel = "API DEGRADED";
+      apiColor = "hsl(var(--terminal-amber))";
+    } else {
+      apiLabel = "API ONLINE";
+      apiColor = "hsl(var(--terminal-green))";
+    }
+  }
+
+  let agentsLabel = isConnecting
+    ? "AGENTS CONNECTING"
+    : `${activeAgentCount || 2} AGENTS ACTIVE`;
+  let agentsColor = "hsl(var(--agent-brief))";
+  if (ready.isSuccess) {
+    if (activeAgentCount === 2) {
+      agentsLabel = "2/2 AGENTS READY";
+      agentsColor = "hsl(var(--terminal-green))";
+    } else if (activeAgentCount === 1) {
+      agentsLabel = criticReady
+        ? "CRITIC ONLINE (1/2)"
+        : "BRIEFING ONLINE (1/2)";
+      agentsColor = "hsl(var(--terminal-amber))";
+    } else {
+      agentsLabel = "0/2 AGENTS READY";
+      agentsColor = "hsl(var(--terminal-red))";
+    }
+  }
+
+  let bundleLabel = "BUNDLE UNREADABLE";
+  let bundleColor = "hsl(var(--terminal-red))";
+  if (isConnecting) {
+    bundleLabel = "BUNDLE CHECKING";
+    bundleColor = "hsl(var(--terminal-amber))";
+  } else if (bundleReady) {
+    const docCount = ready.data?.checks?.document_count
+      ? ` (${ready.data.checks.document_count} DOCS)`
+      : "";
+    bundleLabel = `BUNDLE v${version.data?.bundle_version ?? "1"} READY${docCount}`;
+    bundleColor = "hsl(var(--terminal-green))";
+  }
 
   const indicators = [
     {
+      id: "api",
+      label: apiLabel,
+      live: backendReachable || isConnecting,
+      color: apiColor,
+      title: backendReachable ? "OKF Backend API is reachable" : "Backend unreachable",
+    },
+    {
       id: "agents",
-      label: `${consumerCount || 2} AGENTS ACTIVE`,
-      live: consumerCount > 0 || ready.isPending,
-      color: "hsl(var(--agent-brief))",
+      label: agentsLabel,
+      live: activeAgentCount > 0 || isConnecting,
+      color: agentsColor,
+      title: `Briefing (${briefingInfo?.provider ?? "groq"}): ${briefingReady ? "ONLINE" : "DEGRADED"} | Critic (${analysisInfo?.provider ?? "openai"}): ${criticReady ? "ONLINE" : "DEGRADED"}`,
     },
     {
       id: "bundle",
-      label: bundleReady
-        ? `BUNDLE v${version.data?.bundle_version ?? "?"} READY`
-        : ready.isPending
-          ? "BUNDLE CHECKING"
-          : "BUNDLE UNREADABLE",
-      live: bundleReady || ready.isPending,
-      color: bundleReady
-        ? "hsl(var(--terminal-green))"
-        : ready.isPending
-          ? "hsl(var(--terminal-amber))"
-          : "hsl(var(--terminal-red))",
-    },
-    {
-      id: "api",
-      label: ready.isPending ? "API CONNECTING" : apiOnline ? "API ONLINE" : "API OFFLINE",
-      live: apiOnline || ready.isPending,
-      color: apiOnline
-        ? "hsl(var(--terminal-green))"
-        : ready.isPending
-          ? "hsl(var(--terminal-amber))"
-          : "hsl(var(--terminal-red))",
+      label: bundleLabel,
+      live: bundleReady || isConnecting,
+      color: bundleColor,
+      title: bundleReady ? "Knowledge bundle parsed and ready" : "Bundle unreadable",
     },
   ];
 
   return (
     <div className="flex items-center gap-3">
       {indicators.map((ind) => (
-        <div key={ind.id} className="flex items-center gap-1.5">
+        <div key={ind.id} className="flex items-center gap-1.5" title={ind.title}>
           <motion.span
             animate={ind.live ? { opacity: [1, 0.3, 1] } : { opacity: 0.4 }}
             transition={ind.live ? { repeat: Infinity, duration: 1.8 } : {}}

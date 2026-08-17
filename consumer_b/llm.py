@@ -87,6 +87,11 @@ class ChatClient:
                 raise LLMResponseError(
                     f"LLM authentication failed; check {self._key_env}."
                 ) from exc
+            if "404" in text or "model_not_found" in text or "does not exist" in text:
+                raise LLMResponseError(
+                    f"LLM model {self._model!r} was not found on provider {self._provider!r}; "
+                    f"check OKF_CONSUMER_B_MODEL or update provider model settings."
+                ) from exc
             raise LLMResponseError(f"LLM call failed: {exc}") from exc
 
         if not isinstance(content, str) or not content.strip():

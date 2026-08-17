@@ -29,6 +29,7 @@ from consumer_a.models import (
     CatalogEntry,
     ConsumerConfig,
 )
+from consumer_a.reader import scan_catalog
 from consumer_a.renderer import render_json, render_text
 from consumer_a.retriever import (
     id_score,
@@ -40,6 +41,8 @@ from consumer_a.retriever import (
     total_score,
 )
 from consumer_a.service import ConsumerService
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def FIXED_CLOCK() -> datetime:
@@ -236,6 +239,8 @@ class RetrievalTests(unittest.TestCase):
         with bundle(THREE_DOC_BUNDLE) as root:
             first = make_service(root).answer("tariffs")
             second = make_service(root).answer("tariffs")
+            first.retrieval.retrieval_time_ms = 0
+            second.retrieval.retrieval_time_ms = 0
         self.assertEqual(render_json(first), render_json(second))
 
     def test_body_reads_only_for_selected_documents(self) -> None:
@@ -261,9 +266,61 @@ class RetrievalTests(unittest.TestCase):
         totals = [row.total_score for row in report.ranking]
         self.assertEqual(totals, sorted(totals, reverse=True))
 
+    def test_hormuz_query_retrieval_precision(self) -> None:
+        catalog = scan_catalog(REPO_ROOT / "okf")
+        q = (
+            "What are the main strategic and economic risks associated with disruption "
+            "in the Strait of Hormuz, and which actors have the ability to influence those risks?"
+        )
+        res = select(catalog, q, max_docs=3)
+        selected_ids = [d.id for d in res.selected]
+        self.assertIn("strait-of-hormuz-maritime-tensions", selected_ids)
+        self.assertIn("hormuz-oil-transit-chokepoint", selected_ids)
+        self.assertNotIn("taiwan-strait-military-tensions", selected_ids)
+
+    def test_taiwan_query_precision(self) -> None:
+        catalog = scan_catalog(REPO_ROOT / "okf")
+        q = "How could Taiwan Strait tensions affect semiconductor supply chains?"
+        res = select(catalog, q, max_docs=3)
+        selected_ids = [d.id for d in res.selected]
+        self.assertTrue(
+            any("taiwan" in doc_id or "semiconductor" in doc_id for doc_id in selected_ids)
+        )
+        self.assertNotIn("strait-of-hormuz-maritime-tensions", selected_ids)
+
+    def test_no_cross_topic_contamination(self) -> None:
+        catalog = scan_catalog(REPO_ROOT / "okf")
+        q_hormuz = "What are the risks associated with the Strait of Hormuz?"
+        res_h = select(catalog, q_hormuz, max_docs=3)
+        for doc in res_h.selected:
+            self.assertNotIn("taiwan", doc.id)
+            self.assertNotIn("gaza", doc.id)
+            self.assertNotIn("arunachal", doc.id)
+
 
 class LLMContractTests(unittest.TestCase):
     """parse_briefing strictness and client error mapping."""
+
+    def test_invalid_model_error_mapping(self) -> None:
+        from consumer_a.llm import ChatClient
+        from consumer_a.models import ConsumerConfig
+
+        cfg = ConsumerConfig(
+            bundle_path=REPO_ROOT / "okf",
+            provider="groq",
+            model="invalid-nonexistent-model",
+            groq_api_key="gsk_test_key",
+        )
+        client = ChatClient(cfg)
+        err = "Error 404: The model invalid-nonexistent-model does not exist"
+        with mock.patch.object(
+            client._client.chat.completions,
+            "create",
+            side_effect=Exception(err),
+        ):
+            with self.assertRaises(LLMResponseError) as ctx:
+                client.chat("sys", "user")
+            self.assertIn("was not found on provider", str(ctx.exception))
 
     def test_valid_response(self) -> None:
         briefing = parse_briefing(COVERED_JSON)
@@ -496,8 +553,9 @@ class RendererTests(unittest.TestCase):
         )
 
     def test_deterministic_output(self) -> None:
-        first = render_json(self._report())
-        second = render_json(self._report())
+        report = self._report()
+        first = render_json(report)
+        second = render_json(report)
         self.assertEqual(first, second)
 
 

@@ -78,7 +78,10 @@ async def ready(request: Request) -> ReadyResponse | Response:
         )
     except Exception:
         producer_ready = False
-    checks_ok &= producer_ready
+
+    all_consumers_ready = all(c.get("client_ready", False) for c in consumers.values())
+    core_ready = bundle_accessible and registry_loads
+    checks_ok = core_ready and all_consumers_ready
 
     response = ReadyResponse(
         status="ready" if checks_ok else "not_ready",

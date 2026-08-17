@@ -67,6 +67,13 @@ async function request<T>(
   }
 
   if (!response.ok) {
+    if (path === "/ready") {
+      const parsedReady = readyResponseSchema.safeParse(payload);
+      if (parsedReady.success) {
+        recordDiagnostics(path, Math.round(performance.now() - startedAt), payload);
+        return parsedReady.data as T;
+      }
+    }
     const parsedError = errorEnvelopeSchema.safeParse(payload);
     if (parsedError.success) {
       throw new ApiError(parsedError.data.error.code, parsedError.data.error.message, response.status);
