@@ -13,20 +13,17 @@ boolean-py==5.0
 build==1.5.0
     # via pip-tools
 cachecontrol[filecache]==0.14.4
-    # via pip-audit
-certifi==2026.7.22
     # via
-    #   -c requirements.txt
-    #   requests
+    #   cachecontrol
+    #   pip-audit
+certifi==2026.7.22
+    # via requests
 cfgv==3.5.0
     # via pre-commit
 charset-normalizer==3.4.9
-    # via
-    #   -c requirements.txt
-    #   requests
+    # via requests
 click==8.4.2
     # via
-    #   -c requirements.txt
     #   black
     #   pip-tools
 cyclonedx-python-lib==11.11.0
@@ -43,9 +40,7 @@ filelock==3.32.2
 identify==2.6.19
     # via pre-commit
 idna==3.18
-    # via
-    #   -c requirements.txt
-    #   requests
+    # via requests
 librt==0.14.0
     # via mypy
 license-expression==30.4.4
@@ -68,7 +63,6 @@ packageurl-python==0.17.6
     # via cyclonedx-python-lib
 packaging==26.3
     # via
-    #   -c requirements.txt
     #   black
     #   build
     #   pip-audit
@@ -84,14 +78,14 @@ pip-audit==2.10.1
     # via -r requirements-dev.in
 pip-requirements-parser==32.0.1
     # via pip-audit
-pip-tools==7.6.0
+pip-tools==7.6.1
     # via -r requirements-dev.in
 platformdirs==4.11.0
     # via
     #   black
     #   pip-audit
     #   virtualenv
-pre-commit==4.6.1
+pre-commit==4.6.2
     # via -r requirements-dev.in
 py-serializable==2.1.0
     # via cyclonedx-python-lib
@@ -108,17 +102,14 @@ python-discovery==1.5.1
 pytokens==0.4.1
     # via black
 pyyaml==6.0.3
-    # via
-    #   -c requirements.txt
-    #   pre-commit
+    # via pre-commit
 requests==2.34.2
     # via
-    #   -c requirements.txt
     #   cachecontrol
     #   pip-audit
 rich==15.0.0
     # via pip-audit
-ruff==0.16.1
+ruff==0.16.3
     # via -r requirements-dev.in
 sortedcontainers==2.4.0
     # via cyclonedx-python-lib
@@ -128,13 +119,10 @@ tomli-w==1.2.0
     # via pip-audit
 typing-extensions==4.16.0
     # via
-    #   -c requirements.txt
     #   cyclonedx-python-lib
     #   mypy
 urllib3==2.7.0
-    # via
-    #   -c requirements.txt
-    #   requests
+    # via requests
 virtualenv==21.7.1
     # via pre-commit
 wheel==0.47.0
