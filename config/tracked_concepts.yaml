@@ -15,6 +15,7 @@
 #   lookback_days: optional per-concept override (default from config)
 #   max_results:   optional per-concept override (default from config)
 
+# Seed Documents
 - id: nato
   title: NATO
   resource: actors
@@ -31,7 +32,7 @@
   title: Red Sea Shipping Disruption
   resource: conflicts
   tags: [conflict, maritime-security, trade, middle-east]
-  related: [us-china-tariffs]
+  related: [us-china-tariffs, strait-of-hormuz-maritime-tensions]
   key_actors:
     - Houthi movement in Yemen
     - International Maritime Organization
@@ -55,7 +56,7 @@
   title: US-China Tariffs
   resource: economics
   tags: [economics, us-china, trade, tariffs]
-  related: [us-export-controls-semiconductors]
+  related: [us-export-controls-semiconductors, taiwan-semiconductor-global-supply-chain]
   key_actors:
     - Office of the United States Trade Representative
     - U.S. importers and manufacturers
@@ -67,7 +68,7 @@
   title: US Semiconductor Export Controls
   resource: policy
   tags: [policy, us-china, semiconductors, export-controls]
-  related: [us-china-tariffs]
+  related: [us-china-tariffs, taiwan-semiconductor-global-supply-chain]
   key_actors:
     - U.S. Bureau of Industry and Security
     - Department of Commerce
@@ -75,14 +76,437 @@
     - Chinese semiconductor manufacturers
   search_query: "BIS semiconductor export controls China advanced computing"
 
-- id: opec-plus-production-policy
-  title: OPEC+ Production Policy
-  resource: economics
-  tags: [economics, energy, oil, opec-plus]
-  related: [red-sea-shipping-disruption]
+# Cluster 1: Iran / Strait of Hormuz
+- id: strait-of-hormuz-maritime-tensions
+  title: Strait of Hormuz Maritime Tensions
+  resource: conflicts
+  tags: [conflict, maritime-security, iran, middle-east, hormuz, shipping, energy]
+  related: [hormuz-oil-transit-chokepoint, irgc-navy-gulf-posture, us-fifth-fleet-maritime-security, iran-israel-regional-deterrence]
   key_actors:
-    - OPEC+ member states
-    - Saudi Arabia
-    - Russia
-    - United States
-  search_query: "OPEC+ production policy oil output quotas decision"
+    - Islamic Revolutionary Guard Corps Navy (IRGCN)
+    - United States Naval Forces Central Command (NAVCENT / Fifth Fleet)
+    - International Maritime Security Construct (IMSC / Coalition Task Force Sentinel)
+    - Commercial Tanker Fleet Operators and War-Risk Underwriters
+  search_query: "Strait of Hormuz maritime security Iran tanker shipping tension"
+
+- id: irgc-navy-gulf-posture
+  title: IRGC Navy Gulf Military Posture
+  resource: actors
+  tags: [actor, military, iran, irgc, navy, maritime-security, hormuz, asymmetric-warfare]
+  related: [strait-of-hormuz-maritime-tensions, us-fifth-fleet-maritime-security, hormuz-oil-transit-chokepoint]
+  key_actors:
+    - Islamic Revolutionary Guard Corps Navy (IRGCN)
+    - Supreme National Security Council of Iran
+    - Khatam al-Anbiya Central Headquarters
+  search_query: "IRGC Navy Persian Gulf fast attack craft missiles mines"
+
+- id: us-fifth-fleet-maritime-security
+  title: US Fifth Fleet and IMSC Maritime Operations
+  resource: policy
+  tags: [policy, military, us-navy, fifth-fleet, maritime-security, hormuz, middle-east]
+  related: [strait-of-hormuz-maritime-tensions, irgc-navy-gulf-posture, hormuz-oil-transit-chokepoint, us-iran-diplomatic-deterrence-strategy]
+  key_actors:
+    - US Naval Forces Central Command (NAVCENT / Fifth Fleet)
+    - Coalition Task Force Sentinel (IMSC)
+    - Combined Maritime Forces (CMF)
+    - US Central Command (CENTCOM)
+  search_query: "US Fifth Fleet NAVCENT Task Force 59 IMSC Strait of Hormuz"
+
+- id: hormuz-oil-transit-chokepoint
+  title: Strait of Hormuz Global Energy Transit Risk
+  resource: economics
+  tags: [economics, energy, oil, lng, chokepoint, hormuz, shipping, maritime]
+  related: [strait-of-hormuz-maritime-tensions, irgc-navy-gulf-posture, us-fifth-fleet-maritime-security]
+  key_actors:
+    - US Energy Information Administration (EIA)
+    - International Energy Agency (IEA)
+    - OPEC+ Exporters (Saudi Arabia, UAE, Kuwait, Iraq, Iran, Qatar)
+    - Lloyd's Market Association Joint War Committee
+  search_query: "Strait of Hormuz oil transit chokepoint EIA crude flows LNG"
+
+- id: gulf-states-iran-diplomatic-posture
+  title: Gulf States Diplomatic Engagement with Iran
+  resource: policy
+  tags: [policy, diplomacy, middle-east, gulf-states, saudi-arabia, uae, oman, iran]
+  related: [strait-of-hormuz-maritime-tensions, us-iran-diplomatic-deterrence-strategy, iran-israel-regional-deterrence]
+  key_actors:
+    - Kingdom of Saudi Arabia (Ministry of Foreign Affairs)
+    - United Arab Emirates (Presidential Diplomatic Advisory)
+    - Sultanate of Oman (Ministry of Foreign Affairs)
+    - Islamic Republic of Iran (Ministry of Foreign Affairs)
+    - Gulf Cooperation Council (GCC Secretariat)
+  search_query: "Saudi Arabia UAE Oman Iran diplomacy Persian Gulf de-escalation"
+
+- id: iran-nuclear-enrichment-sanctions
+  title: Iran Nuclear Enrichment and Sanctions Pressure
+  resource: policy
+  tags: [policy, nuclear, nonproliferation, iaea, iran, sanctions, ofac, uranium-enrichment]
+  related: [us-iran-diplomatic-deterrence-strategy, iran-israel-regional-deterrence, strait-of-hormuz-maritime-tensions]
+  key_actors:
+    - International Atomic Energy Agency (IAEA)
+    - Atomic Energy Organization of Iran (AEOI)
+    - US Department of the Treasury (OFAC)
+    - E3 European Negotiators (France, Germany, United Kingdom)
+  search_query: "IAEA Iran nuclear enrichment 60 percent Fordow OFAC sanctions"
+
+- id: iran-israel-regional-deterrence
+  title: Iran-Israel Regional Deterrence and Standoff
+  resource: conflicts
+  tags: [conflict, deterrence, israel, iran, middle-east, air-defense, ballistic-missiles, drones]
+  related: [strait-of-hormuz-maritime-tensions, iran-nuclear-enrichment-sanctions, us-iran-diplomatic-deterrence-strategy, israel-lebanon-border-conflict]
+  key_actors:
+    - Islamic Republic of Iran (Armed Forces General Staff & IRGC Aerospace Force)
+    - State of Israel (Israel Defense Forces & Mossad)
+    - United States Central Command (CENTCOM)
+  search_query: "Iran Israel deterrence ballistic missile air defense strikes"
+
+- id: us-iran-diplomatic-deterrence-strategy
+  title: US Strategic Deterrence and Sanctions Policy toward Iran
+  resource: policy
+  tags: [policy, diplomacy, us-policy, iran, sanctions, deterrence, national-security]
+  related: [us-fifth-fleet-maritime-security, iran-nuclear-enrichment-sanctions, strait-of-hormuz-maritime-tensions, gulf-states-iran-diplomatic-posture]
+  key_actors:
+    - US Department of State (Special Envoy for Iran)
+    - US Department of Defense (Office of the Secretary of Defense)
+    - US National Security Council (NSC)
+    - Embassy of Switzerland in Tehran (Foreign Interests Section)
+  search_query: "US policy Iran deterrence sanctions State Department CENTCOM"
+
+# Cluster 2: China / Taiwan
+- id: taiwan-strait-military-tensions
+  title: Taiwan Strait Military Tensions and Exercises
+  resource: conflicts
+  tags: [conflict, military, china, taiwan, taiwan-strait, pla, adiz, joint-sword]
+  related: [pla-eastern-theater-command, taiwan-armed-forces-defense-posture, taiwan-blockade-quarantine-scenarios, us-taiwan-relations-deterrence]
+  key_actors:
+    - People's Liberation Army (Eastern Theater Command)
+    - Taiwan Ministry of National Defense (Republic of China Armed Forces)
+    - China Coast Guard (CCG)
+    - US Indo-Pacific Command (INDOPACOM)
+  search_query: "Taiwan Strait PLA military exercises ADIZ median line incursions"
+
+- id: pla-eastern-theater-command
+  title: PLA Eastern Theater Command Cross-Strait Posture
+  resource: actors
+  tags: [actor, military, china, pla, eastern-theater-command, navy, air-force, rocket-force]
+  related: [taiwan-strait-military-tensions, taiwan-blockade-quarantine-scenarios, china-taiwan-reunification-policy]
+  key_actors:
+    - Central Military Commission (CMC) of the PRC
+    - PLA Eastern Theater Command Headquarters (Nanjing)
+    - PLA Eastern Theater Navy (Ningbo) & Air Force (Fuzhou)
+    - PLA Rocket Force (PLARF 61st Base)
+  search_query: "PLA Eastern Theater Command Taiwan cross-strait joint drills"
+
+- id: taiwan-armed-forces-defense-posture
+  title: Taiwan Armed Forces Asymmetric Defense Posture
+  resource: actors
+  tags: [actor, military, taiwan, defense, asymmetric-warfare, odc, conscription, han-kuang]
+  related: [taiwan-strait-military-tensions, taiwan-blockade-quarantine-scenarios, us-taiwan-relations-deterrence]
+  key_actors:
+    - Taiwan Ministry of National Defense (MND)
+    - General Staff Headquarters (ROC Armed Forces)
+    - All-Out Defense Mobilization Agency
+    - National Chung-Shan Institute of Science and Technology (NCSIST)
+  search_query: "Taiwan military asymmetric defense Han Kuang conscription missiles"
+
+- id: taiwan-blockade-quarantine-scenarios
+  title: Taiwan Maritime Blockade and Quarantine Scenarios
+  resource: conflicts
+  tags: [conflict, scenario, taiwan, blockade, quarantine, maritime, grey-zone, energy-security]
+  related: [taiwan-strait-military-tensions, pla-eastern-theater-command, taiwan-semiconductor-global-supply-chain, us-taiwan-relations-deterrence]
+  key_actors:
+    - China Coast Guard (CCG) & PLA Navy (PLAN)
+    - Taiwan Coast Guard Administration (CGA) & Navy (ROCN)
+    - Center for Strategic and International Studies (CSIS)
+    - Global Commercial Shipping and Maritime Insurance Firms
+  search_query: "Taiwan blockade quarantine scenario CSIS China Coast Guard energy"
+
+- id: us-taiwan-relations-deterrence
+  title: US Taiwan Policy and Deterrence Architecture
+  resource: policy
+  tags: [policy, diplomacy, us-policy, taiwan, deterrence, tra, arms-sales, indo-pacific]
+  related: [taiwan-strait-military-tensions, taiwan-armed-forces-defense-posture, china-taiwan-reunification-policy, indo-pacific-taiwan-regional-alignment]
+  key_actors:
+    - US Department of State
+    - American Institute in Taiwan (AIT)
+    - US Defense Security Cooperation Agency (DSCA)
+    - US Indo-Pacific Command (INDOPACOM)
+  search_query: "US Taiwan Relations Act arms sales deterrence Taiwan Strait"
+
+- id: china-taiwan-reunification-policy
+  title: Beijing Cross-Strait Policy and Sovereignty Claims
+  resource: policy
+  tags: [policy, china, taiwan, reunification, one-china, sovereignty, ccp, anti-secession-law]
+  related: [taiwan-strait-military-tensions, pla-eastern-theater-command, us-taiwan-relations-deterrence]
+  key_actors:
+    - Taiwan Affairs Office of the State Council (TAO)
+    - Ministry of Foreign Affairs of the PRC (MFA)
+    - Central Foreign Affairs Commission (CCP)
+    - National People's Congress (NPC Standing Committee)
+  search_query: "China Taiwan Affairs Office One-China Principle Anti-Secession Law"
+
+- id: taiwan-semiconductor-global-supply-chain
+  title: Taiwan Semiconductor Dominance and Global Supply Chain Risk
+  resource: economics
+  tags: [economics, semiconductors, tsmc, supply-chain, chips, technology, geopolitics]
+  related: [us-export-controls-semiconductors, taiwan-strait-military-tensions, taiwan-blockade-quarantine-scenarios]
+  key_actors:
+    - Taiwan Semiconductor Manufacturing Company (TSMC)
+    - Semiconductor Industry Association (SIA)
+    - TrendForce Market Intelligence
+    - Ministry of Economic Affairs of Taiwan (MOEA)
+  search_query: "TSMC Taiwan advanced semiconductor foundry supply chain disruption"
+
+- id: indo-pacific-taiwan-regional-alignment
+  title: Indo-Pacific Regional Security Alignment on Taiwan Strait
+  resource: policy
+  tags: [policy, diplomacy, indo-pacific, japan, philippines, first-island-chain, deterrence, g7]
+  related: [us-taiwan-relations-deterrence, taiwan-strait-military-tensions, pla-eastern-theater-command]
+  key_actors:
+    - Ministry of Defense of Japan (JMOD / Japan Self-Defense Forces)
+    - Department of National Defense of the Philippines (DND)
+    - US Indo-Pacific Command (INDOPACOM)
+    - G7 Group of Nations
+  search_query: "Japan Philippines Nansei Islands EDCA Taiwan Strait peace stability"
+
+# Cluster 3: Gaza / Israel
+- id: gaza-military-operations-security
+  title: Gaza Military Operations and Security Control
+  resource: conflicts
+  tags: [conflict, military, gaza, israel, idf, hamas, middle-east, urban-warfare, tunnels]
+  related: [hamas-military-political-structure, israel-gaza-war-objectives, gaza-ceasefire-hostage-negotiations, gaza-humanitarian-crisis-infrastructure]
+  key_actors:
+    - Israel Defense Forces (IDF Southern Command)
+    - Izz ad-Din al-Qassam Brigades (Hamas Armed Wing)
+    - Palestinian Islamic Jihad (Al-Quds Brigades)
+    - Egyptian Border Guard Forces
+  search_query: "Gaza military operations IDF Philadelphi Netzarim corridor tunnels"
+
+- id: hamas-military-political-structure
+  title: Hamas Political and Military Structure
+  resource: actors
+  tags: [actor, palestine, gaza, hamas, qassam-brigades, political-bureau, insurgency]
+  related: [gaza-military-operations-security, gaza-ceasefire-hostage-negotiations, israel-gaza-war-objectives, palestinian-authority-post-war-governance]
+  key_actors:
+    - Hamas Political Bureau (Doha / Regional Delegations)
+    - Izz ad-Din al-Qassam Brigades (Field Commands)
+    - Shura Council of Hamas
+    - European Council on Foreign Relations (ECFR Palestinian Mapping)
+  search_query: "Hamas political bureau Qassam brigades Gaza leadership negotiations"
+
+- id: israel-gaza-war-objectives
+  title: Israeli War Objectives and Post-Conflict Strategy
+  resource: policy
+  tags: [policy, israel, gaza, war-cabinet, security, netanyahu, demilitarization, hostages]
+  related: [gaza-military-operations-security, gaza-ceasefire-hostage-negotiations, us-diplomatic-involvement-gaza]
+  key_actors:
+    - Prime Minister's Office of Israel (Benjamin Netanyahu)
+    - Israeli Security Cabinet (Ministers of Defense, Strategic Affairs, and Foreign Affairs)
+    - Israel Defense Forces General Staff (Chief of the General Staff)
+    - Institute for National Security Studies (INSS Tel Aviv)
+  search_query: "Israel war objectives Gaza disarmament security control hostages"
+
+- id: gaza-ceasefire-hostage-negotiations
+  title: Gaza Ceasefire and Hostage Exchange Negotiations
+  resource: policy
+  tags: [policy, diplomacy, ceasefire, negotiations, qatar, egypt, us, hostages, un-resolution]
+  related: [gaza-military-operations-security, israel-gaza-war-objectives, hamas-military-political-structure, us-diplomatic-involvement-gaza]
+  key_actors:
+    - State of Qatar (Ministry of Foreign Affairs & State Security)
+    - Arab Republic of Egypt (General Intelligence Directorate)
+    - United States Government (CIA Director & Special Envoys)
+    - United Nations Security Council (UNSC)
+  search_query: "Gaza ceasefire negotiations Qatar Egypt US hostages UNSC 2735"
+
+- id: gaza-humanitarian-crisis-infrastructure
+  title: Gaza Humanitarian Crisis and Infrastructure Breakdown
+  resource: conflicts
+  tags: [conflict, humanitarian, gaza, un-ocha, ipc, unrwa, displacement, food-insecurity, healthcare]
+  related: [gaza-military-operations-security, gaza-ceasefire-hostage-negotiations, us-diplomatic-involvement-gaza]
+  key_actors:
+    - United Nations Office for the Coordination of Humanitarian Affairs (UN OCHA)
+    - Integrated Food Security Phase Classification (IPC Global)
+    - United Nations Relief and Works Agency for Palestine Refugees (UNRWA)
+    - World Food Programme (WFP) & World Health Organization (WHO)
+  search_query: "Gaza humanitarian crisis UN OCHA IPC food insecurity UNRWA displacement"
+
+- id: us-diplomatic-involvement-gaza
+  title: US Diplomatic and Security Policy on Gaza Conflict
+  resource: policy
+  tags: [policy, diplomacy, us-policy, gaza, middle-east, state-department, two-state-solution]
+  related: [gaza-ceasefire-hostage-negotiations, israel-gaza-war-objectives, palestinian-authority-post-war-governance]
+  key_actors:
+    - US Department of State (Secretary of State)
+    - US National Security Council (NSC)
+    - US Agency for International Development (USAID)
+    - Central Intelligence Agency (CIA Mediation Team)
+  search_query: "US policy Gaza ceasefire humanitarian aid revitalized PA"
+
+- id: palestinian-authority-post-war-governance
+  title: Palestinian Authority and Regional Post-Conflict Stabilization Plans
+  resource: policy
+  tags: [policy, palestine, palestinian-authority, gaza, west-bank, arab-league, governance, reconstruction]
+  related: [hamas-military-political-structure, israel-gaza-war-objectives, us-diplomatic-involvement-gaza, gaza-ceasefire-hostage-negotiations]
+  key_actors:
+    - Palestinian National Authority (Cabinet of Mohammad Mustafa)
+    - Palestine Liberation Organization (PLO Executive Committee)
+    - League of Arab States (Arab League Secretariat)
+    - International Crisis Group (ICG)
+  search_query: "Palestinian Authority Gaza post-war governance technocratic cabinet"
+
+# Cluster 4: Israel / Hezbollah / Lebanon
+- id: israel-lebanon-border-conflict
+  title: Israel-Lebanon Border Conflict and Escalation
+  resource: conflicts
+  tags: [conflict, military, lebanon, israel, hezbollah, border, blue-line, idf, displacement]
+  related: [hezbollah-military-arsenal-posture, unscr-1701-disarmament-framework, israel-northern-border-security-doctrine, us-france-lebanon-diplomatic-mediation]
+  key_actors:
+    - Israel Defense Forces (IDF Northern Command)
+    - Lebanese Hezbollah (Islamic Resistance in Lebanon)
+    - United Nations Interim Force in Lebanon (UNIFIL)
+    - Lebanese Armed Forces (LAF)
+  search_query: "Israel Lebanon border conflict Hezbollah Blue Line strikes evacuations"
+
+- id: hezbollah-military-arsenal-posture
+  title: Hezbollah Military Arsenal and Operational Posture
+  resource: actors
+  tags: [actor, military, hezbollah, lebanon, radwan-force, missiles, rockets, drones, asymmetric-warfare]
+  related: [israel-lebanon-border-conflict, unscr-1701-disarmament-framework, israel-northern-border-security-doctrine]
+  key_actors:
+    - Hezbollah Shura Council & Jihad Council
+    - Radwan Special Forces Unit
+    - Center for Strategic and International Studies (CSIS)
+    - Alma Research and Education Center
+  search_query: "Hezbollah missile arsenal Radwan force precision rockets CSIS"
+
+- id: unscr-1701-disarmament-framework
+  title: UNSCR 1701 and Armed Group Disarmament Framework
+  resource: policy
+  tags: [policy, un-resolution, unscr-1701, lebanon, israel, hezbollah, unifil, disarmament, litani-river]
+  related: [israel-lebanon-border-conflict, hezbollah-military-arsenal-posture, israel-northern-border-security-doctrine, lebanese-government-armed-forces-posture]
+  key_actors:
+    - United Nations Security Council (UNSC)
+    - United Nations Interim Force in Lebanon (UNIFIL)
+    - Government of Lebanon (Cabinet & Ministry of National Defense)
+    - State of Israel (Ministry of Foreign Affairs & IDF)
+  search_query: "UNSCR 1701 resolution Lebanon Litani River disarmament UNIFIL"
+
+- id: israel-northern-border-security-doctrine
+  title: Israel Northern Border Security Doctrine and Buffer Demands
+  resource: policy
+  tags: [policy, israel, northern-command, security-doctrine, buffer-zone, hezbollah, litani-river, evacuations]
+  related: [israel-lebanon-border-conflict, hezbollah-military-arsenal-posture, unscr-1701-disarmament-framework]
+  key_actors:
+    - Israel Ministry of Defense (Minister of Defense)
+    - IDF Northern Command (Maj. Gen. Ori Gordin)
+    - Israeli Security Cabinet
+    - Northern Israel Regional Municipal Councils
+  search_query: "Israel northern border security demands Hezbollah Litani buffer return residents"
+
+- id: lebanese-government-armed-forces-posture
+  title: Lebanese Government and Armed Forces Border Posture
+  resource: policy
+  tags: [policy, lebanon, laf, armed-forces, mikati, beirut, unifil, border-security]
+  related: [unscr-1701-disarmament-framework, israel-lebanon-border-conflict, us-france-lebanon-diplomatic-mediation]
+  key_actors:
+    - Lebanese Presidency of the Council of Ministers (Najib Mikati)
+    - Lebanese Armed Forces (LAF Commander & General Directorate)
+    - Ministry of National Defense of Lebanon
+    - International Support Group for Lebanon (ISG)
+  search_query: "Lebanese Armed Forces LAF deployment south Litani Mikati 1701"
+
+- id: us-france-lebanon-diplomatic-mediation
+  title: US and French Diplomatic Initiatives on Lebanon Border
+  resource: policy
+  tags: [policy, diplomacy, us-policy, france, lebanon, israel, hochstein, border-demarcation, mediation]
+  related: [unscr-1701-disarmament-framework, israel-lebanon-border-conflict, lebanese-government-armed-forces-posture]
+  key_actors:
+    - US Department of State (Special Presidential Envoy Amos Hochstein)
+    - French Ministry for Europe and Foreign Affairs (Élysée Special Envoys)
+    - Lebanese Parliament (Speaker Nabih Berri as intermediary)
+    - Israeli National Security Council (NSC)
+  search_query: "Amos Hochstein France diplomatic proposal Israel Lebanon border de-escalation"
+
+# Cluster 5: India / China / Arunachal Pradesh
+- id: india-china-lac-eastern-sector
+  title: India-China LAC Tensions in the Eastern Sector
+  resource: conflicts
+  tags: [conflict, military, india, china, lac, eastern-sector, arunachal-pradesh, tawang, yangtse, border-dispute]
+  related: [arunachal-pradesh-territorial-dispute, china-zangnan-sovereignty-claims, india-border-infrastructure-development, pla-border-defense-infrastructure, india-china-diplomatic-border-negotiations]
+  key_actors:
+    - Indian Army (Eastern Command / 3 Corps & 4 Corps)
+    - People's Liberation Army (Western Theater Command / Tibet Military District)
+    - Indo-Tibetan Border Police (ITBP)
+    - Ministry of Defence of India
+  search_query: "India China LAC Eastern Sector Arunachal Pradesh Tawang military tensions"
+
+- id: arunachal-pradesh-territorial-dispute
+  title: Indian Sovereignty and Territorial Integrity in Arunachal Pradesh
+  resource: policy
+  tags: [policy, sovereignty, india, arunachal-pradesh, mea, territory, survey-of-india, national-integrity]
+  related: [india-china-lac-eastern-sector, china-zangnan-sovereignty-claims, india-border-infrastructure-development, international-positions-arunachal-pradesh]
+  key_actors:
+    - Ministry of External Affairs of India (MEA)
+    - Government of Arunachal Pradesh (Chief Minister's Office)
+    - Survey of India (Department of Science and Technology)
+    - Ministry of Home Affairs of India (MHA)
+  search_query: "India MEA Arunachal Pradesh inalienable part sovereignty rejection China renaming"
+
+- id: china-zangnan-sovereignty-claims
+  title: Chinese Sovereignty Claims and Standardization of Zangnan Names
+  resource: policy
+  tags: [policy, china, sovereignty-claims, zangnan, arunachal-pradesh, ministry-of-civil-affairs, cartography, border-dispute]
+  related: [arunachal-pradesh-territorial-dispute, india-china-lac-eastern-sector, international-positions-arunachal-pradesh]
+  key_actors:
+    - Ministry of Civil Affairs of the PRC (Place Name Standardization Department)
+    - Ministry of National Defense of the PRC (Information Bureau)
+    - Ministry of Foreign Affairs of the PRC (Asian Affairs Department)
+    - Government of Tibet Autonomous Region (TAR)
+  search_query: "China Ministry of Civil Affairs Zangnan standardized geographical names South Tibet"
+
+- id: india-border-infrastructure-development
+  title: India Border Infrastructure Development in Arunachal Pradesh
+  resource: policy
+  tags: [policy, infrastructure, india, arunachal-pradesh, sela-tunnel, bro, vibrant-villages, frontier-highway]
+  related: [arunachal-pradesh-territorial-dispute, india-china-lac-eastern-sector, pla-border-defense-infrastructure]
+  key_actors:
+    - Border Roads Organisation (BRO India / Project Vartak)
+    - Ministry of Home Affairs of India (Vibrant Villages Programme Directorate)
+    - Ministry of Road Transport and Highways (MoRTH)
+    - Indian Army Corps of Engineers
+  search_query: "India BRO Sela Tunnel Arunachal Pradesh Vibrant Villages Frontier Highway"
+
+- id: pla-border-defense-infrastructure
+  title: PLA Border Defense Posture and Xiaokang Model Villages
+  resource: actors
+  tags: [actor, military, china, pla, western-theater-command, xiaokang-villages, tibet, dual-use, infrastructure]
+  related: [india-china-lac-eastern-sector, china-zangnan-sovereignty-claims, india-border-infrastructure-development]
+  key_actors:
+    - PLA Western Theater Command (Tibet Military District)
+    - Government of the Tibet Autonomous Region (Poverty Alleviation & Border Affairs Offices)
+    - Center for Strategic and International Studies (CSIS ChinaPower)
+    - Observer Research Foundation (ORF India)
+  search_query: "PLA Tibet border defense Xiaokang model villages dual use airbases LAC"
+
+- id: india-china-diplomatic-border-negotiations
+  title: India-China Working Mechanism for Consultation on Border Affairs
+  resource: policy
+  tags: [policy, diplomacy, india, china, wmcc, border-talks, disengagement, mea, mfa]
+  related: [india-china-lac-eastern-sector, arunachal-pradesh-territorial-dispute, international-positions-arunachal-pradesh]
+  key_actors:
+    - Ministry of External Affairs of India (Joint Secretary, East Asia Division)
+    - Ministry of Foreign Affairs of the PRC (Director-General, Department of Boundary & Oceanic Affairs)
+    - Indian Army & PLA Corps Commanders
+  search_query: "India China WMCC border talks disengagement diplomacy MEA MFA"
+
+- id: international-positions-arunachal-pradesh
+  title: International and Legal Perspectives on Arunachal Pradesh and McMahon Line
+  resource: policy
+  tags: [policy, international-law, diplomacy, mcmahon-line, simla-convention, us-policy, lowy-institute, treaty-law]
+  related: [arunachal-pradesh-territorial-dispute, china-zangnan-sovereignty-claims, india-china-diplomatic-border-negotiations]
+  key_actors:
+    - US Department of State (Bureau of South and Central Asian Affairs)
+    - United States Congress (Senate Foreign Relations Committee)
+    - Lowy Institute for International Policy
+    - International Court of Justice & Treaty Law Scholars
+  search_query: "US recognizes Arunachal Pradesh India territory McMahon Line Simla Convention"

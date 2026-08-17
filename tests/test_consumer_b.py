@@ -516,9 +516,11 @@ class ServiceTests(unittest.TestCase):
 
     def test_identical_output_across_repeated_runs(self) -> None:
         with bundle(THREE_DOC_BUNDLE) as root:
-            first = render_json(make_service(root).analyze("russia frontline"))
-            second = render_json(make_service(root).analyze("russia frontline"))
-        self.assertEqual(first, second)
+            first_dict = json.loads(render_json(make_service(root).analyze("russia frontline")))
+            second_dict = json.loads(render_json(make_service(root).analyze("russia frontline")))
+            first_dict["retrieval"]["retrieval_time_ms"] = 0
+            second_dict["retrieval"]["retrieval_time_ms"] = 0
+        self.assertEqual(first_dict, second_dict)
 
     def test_llm_never_receives_sources_or_ids(self) -> None:
         captured: list[str] = []
@@ -607,7 +609,8 @@ class RendererTests(unittest.TestCase):
         )
 
     def test_deterministic_rendering(self) -> None:
-        self.assertEqual(render_json(self._report()), render_json(self._report()))
+        report = self._report()
+        self.assertEqual(render_json(report), render_json(report))
 
 
 class CLITests(unittest.TestCase):

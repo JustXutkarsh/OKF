@@ -166,17 +166,24 @@ def _parse_bullets(section: str) -> list[str]:
     ]
 
 
+def _unquote_yaml_scalar(text: str) -> str:
+    s = text.strip()
+    if len(s) >= 2 and s[0] == s[-1] and s[0] in ('"', "'"):
+        return s[1:-1].replace('\\"', '"').replace("\\'", "'").replace("\\\\", "\\")
+    return s
+
+
 def _parse_sources(section: str) -> list[SourceRef]:
     entries: list[dict[str, str]] = []
     current: dict[str, str] | None = None
     for line in section.splitlines():
         stripped = line.strip()
         if stripped.startswith("- title:"):
-            current = {"title": stripped.removeprefix("- title:").strip()}
+            current = {"title": _unquote_yaml_scalar(stripped.removeprefix("- title:"))}
             entries.append(current)
         elif current is not None and line.startswith("  ") and ":" in stripped:
             key, _, value = stripped.partition(":")
-            current[key.strip()] = value.strip()
+            current[key.strip()] = _unquote_yaml_scalar(value)
     # Malformed source metadata is handled deterministically: entries
     # without a URL are dropped (a source without a URL is not citable).
     return [
