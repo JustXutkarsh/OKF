@@ -152,6 +152,45 @@ async def metrics() -> Response:
     return Response(content=render_metrics(), media_type=METRICS_CONTENT_TYPE)
 
 
+@router.get(
+    "/graph",
+    summary="Knowledge graph of concepts and relationships in the OKF bundle.",
+    description="Returns all nodes and validated internal edges derived from bundle frontmatter.",
+)
+async def graph(request: Request) -> dict:
+    from consumer_a.reader import scan_catalog
+
+    registry = request.app.state.registry
+    adapters = registry.all()
+    bundle_path = adapters[0].service._config.bundle_path if adapters else None
+    if not bundle_path:
+        return {"nodes": [], "edges": [], "errors": ["Bundle not configured"]}
+
+    try:
+        catalog = scan_catalog(bundle_path)
+    except Exception as exc:
+        return {"nodes": [], "edges": [], "errors": [str(exc)]}
+
+    id_set = {entry.id for entry in catalog}
+    nodes = [
+        {
+            "id": entry.id,
+            "title": entry.title,
+            "type": entry.resource or "concept",
+            "resource": entry.resource,
+            "confidence": entry.confidence,
+        }
+        for entry in catalog
+    ]
+    edges = [
+        {"id": f"{entry.id}->{rel}", "source": entry.id, "target": rel}
+        for entry in catalog
+        for rel in entry.related
+        if rel in id_set
+    ]
+    return {"nodes": nodes, "edges": edges, "errors": []}
+
+
 def _pkg_version(package: str) -> str:
     try:
         module = __import__(package)

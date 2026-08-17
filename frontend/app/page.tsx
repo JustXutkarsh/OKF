@@ -254,7 +254,14 @@ function MissionResults({ params }: { params: QuestionParams }) {
           </span>
         </div>
 
-        <KnowledgeGraphPanel />
+        <KnowledgeGraphPanel
+          retrievedDocumentIds={Array.from(
+            new Set([
+              ...(brief.data?.documents_used || []),
+              ...(analyze.data?.documents_used || []),
+            ])
+          )}
+        />
       </section>
     </div>
   );

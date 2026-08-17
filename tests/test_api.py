@@ -345,6 +345,16 @@ class EndpointTests(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertIn("critical_analysis", r.json())
 
+    def test_graph_endpoint_returns_nodes_and_edges(self) -> None:
+        with api_client() as (client, app):
+            r = client.get("/api/v1/graph")
+        self.assertEqual(r.status_code, 200)
+        data = r.json()
+        self.assertIn("nodes", data)
+        self.assertIn("edges", data)
+        self.assertGreater(len(data["nodes"]), 30)
+        self.assertGreater(len(data["edges"]), 50)
+
 
 class ErrorMappingTests(unittest.TestCase):
     def _post_with_error(self, exc: Exception):

@@ -38,6 +38,54 @@ MODIFIERS = frozenset(
     "treaty agreement convention resolution accord policy doctrine supply chain chains".split()
 )
 
+# Recognized geopolitical theatres / entity clusters for
+# deterministic multi-topic query decomposition
+THEATRE_PATTERNS: list[tuple[str, re.Pattern, str]] = [
+    (
+        "Taiwan",
+        re.compile(r"\b(taiwan|taiwan\s+strait|taipei|tsmc)\b", re.IGNORECASE),
+        "Taiwan Taiwan Strait",
+    ),
+    (
+        "Strait of Hormuz",
+        re.compile(r"\b(hormuz|strait\s+of\s+hormuz|persian\s+gulf|irgc)\b", re.IGNORECASE),
+        "Strait of Hormuz Hormuz",
+    ),
+    (
+        "Gaza",
+        re.compile(r"\b(gaza|hamas|philadelphi|rafah)\b", re.IGNORECASE),
+        "Gaza",
+    ),
+    (
+        "Israel-Lebanon",
+        re.compile(r"\b(israel[- ]lebanon|lebanon|hezbollah|unscr\s+1701|litani)\b", re.IGNORECASE),
+        "Israel Lebanon Hezbollah",
+    ),
+    (
+        "India-China",
+        re.compile(
+            r"\b(india[- ]china|sino[- ]indian|arunachal|arunachal\s+pradesh|lac|zangnan)\b",
+            re.IGNORECASE,
+        ),
+        "India China Arunachal Pradesh LAC",
+    ),
+    (
+        "Red Sea",
+        re.compile(r"\b(red\s+sea|houthi|bab\s+el[- ]mandeb|yemen)\b", re.IGNORECASE),
+        "Red Sea Houthi",
+    ),
+    (
+        "NATO",
+        re.compile(r"\b(nato|eastern\s+flank)\b", re.IGNORECASE),
+        "NATO",
+    ),
+    (
+        "US-China Tariffs",
+        re.compile(r"\b(tariffs?|export\s+controls?)\b", re.IGNORECASE),
+        "US-China tariffs export controls",
+    ),
+]
+
 _TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
 
 
@@ -57,6 +105,14 @@ def _normalized(text: str) -> str:
     """Lowercase text with punctuation collapsed to single spaces."""
 
     return " ".join(_TOKEN_PATTERN.findall(text.lower()))
+
+
+def detect_topics(question: str) -> list[tuple[str, str]]:
+    """Deterministically detect recognized geopolitical theatres/entities in the question."""
+
+    return [
+        (name, topic_q) for name, pattern, topic_q in THEATRE_PATTERNS if pattern.search(question)
+    ]
 
 
 def title_score(question_tokens: list[str], entry: CatalogEntry) -> int:
@@ -132,8 +188,10 @@ def total_score(question: str, entry: CatalogEntry) -> int:
     )
 
 
-def select(catalog: list[CatalogEntry], question: str, max_docs: int) -> RetrievalResult:
-    """Score the catalog, rank deterministically, return precision selection + ranking."""
+def select_single_topic(
+    catalog: list[CatalogEntry], question: str, max_docs: int
+) -> RetrievalResult:
+    """Score the catalog for a single query scope, rank deterministically, return selection."""
 
     tokens = tokenize(question)
     rows: list[tuple[CatalogEntry, RankingEntry]] = []
@@ -188,3 +246,36 @@ def select(catalog: list[CatalogEntry], question: str, max_docs: int) -> Retriev
         selected=selected_docs,
         ranking=[rank for _, rank in rows],
     )
+
+
+def select(catalog: list[CatalogEntry], question: str, max_docs: int = 3) -> RetrievalResult:
+    """Deterministic lexical retriever with multi-topic query decomposition."""
+
+    topics = detect_topics(question)
+    if len(topics) >= 2:
+        # Multi-theatre comparative query: decompose into deterministic topic scopes
+        merged_selected: list[CatalogEntry] = []
+        seen_ids: set[str] = set()
+        merged_ranking: list[RankingEntry] = []
+        seen_rank_ids: set[str] = set()
+
+        per_topic_limit = max(2, max_docs)
+        for _, topic_query in topics:
+            topic_res = select_single_topic(catalog, topic_query, per_topic_limit)
+            for doc in topic_res.selected:
+                if doc.id not in seen_ids:
+                    seen_ids.add(doc.id)
+                    merged_selected.append(doc)
+            for rank in topic_res.ranking:
+                if rank.document_id not in seen_rank_ids:
+                    seen_rank_ids.add(rank.document_id)
+                    merged_ranking.append(rank)
+
+        merged_ranking.sort(key=lambda item: (-item.total_score, item.document_id))
+        return RetrievalResult(
+            candidate_count=len(catalog),
+            selected=merged_selected,
+            ranking=merged_ranking,
+        )
+
+    return select_single_topic(catalog, question, max_docs)

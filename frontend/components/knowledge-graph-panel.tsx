@@ -33,7 +33,8 @@ function getTypeColor(type: string): string {
 
 function layoutGraph(
   graph: KnowledgeGraph | null | undefined,
-  isDark: boolean
+  isDark: boolean,
+  retrievedSet: Set<string>
 ): { nodes: Node[]; edges: Edge[] } {
   const rawNodes = graph?.nodes ?? [];
   const rawEdges = graph?.edges ?? [];
@@ -42,57 +43,82 @@ function layoutGraph(
     if (!groups.has(n.type)) groups.set(n.type, groups.size);
   });
   const byType = [...groups.keys()];
-  const center = { x: 240, y: 160 };
+  const center = { x: 300, y: 200 };
   const nodes: Node[] = [];
 
-  const orbitRadius = Math.max(80, rawNodes.length * 10);
+  const orbitRadius = Math.max(120, rawNodes.length * 9);
   rawNodes.forEach((n, i) => {
+    const isRetrieved = retrievedSet.has(n.id);
     const typeIdx = byType.indexOf(n.type);
     const angle = (i / (rawNodes.length || 1)) * Math.PI * 2;
-    const jitter = (i % 3) * 12;
-    const x = center.x + Math.cos(angle) * (orbitRadius + jitter);
-    const y = center.y + Math.sin(angle) * (orbitRadius + jitter) + typeIdx * 4;
-    const color = getTypeColor(n.type);
+    const jitter = (i % 3) * 16;
+    const radius = isRetrieved ? orbitRadius * 0.65 : orbitRadius + jitter;
+    const x = center.x + Math.cos(angle) * radius;
+    const y = center.y + Math.sin(angle) * radius + typeIdx * 4;
+    const color = isRetrieved ? "hsl(var(--terminal-green))" : getTypeColor(n.type);
+
     nodes.push({
       id: n.id,
       position: { x, y },
-      data: { label: n.title, node: n },
+      data: { label: isRetrieved ? `★ ${n.title}` : n.title, node: n },
       style: {
-        background: isDark ? "hsl(224 45% 9%)" : "hsl(0 0% 100%)",
-        border: `1px solid ${color}50`,
+        background: isRetrieved
+          ? (isDark ? "hsl(145 60% 12%)" : "hsl(145 70% 95%)")
+          : (isDark ? "hsl(224 45% 9%)" : "hsl(0 0% 100%)"),
+        border: isRetrieved
+          ? `2px solid hsl(var(--terminal-green))`
+          : `1px solid ${color}50`,
         borderRadius: 6,
         fontSize: 10,
+        fontWeight: isRetrieved ? 600 : 400,
         padding: "5px 8px",
-        color: isDark ? "hsl(210 40% 85%)" : "hsl(220 40% 15%)",
-        maxWidth: 150,
-        boxShadow: isDark ? `0 0 12px -4px ${color}40` : "none",
+        color: isRetrieved
+          ? (isDark ? "hsl(145 80% 90%)" : "hsl(145 80% 20%)")
+          : (isDark ? "hsl(210 40% 85%)" : "hsl(220 40% 15%)"),
+        maxWidth: 160,
+        boxShadow: isRetrieved
+          ? "0 0 16px 2px hsl(var(--terminal-green) / 0.45)"
+          : (isDark ? `0 0 12px -4px ${color}40` : "none"),
         fontFamily: "var(--font-geist-mono)",
+        zIndex: isRetrieved ? 10 : 1,
       },
     });
   });
 
-  const edgeColor = isDark ? "hsl(215 20% 40%)" : "hsl(214 32% 75%)";
-  const edges: Edge[] = rawEdges.map((e, i) => ({
-    id: e.id || `edge-${i}`,
-    source: e.source,
-    target: e.target,
-    style: {
-      stroke: edgeColor,
-      opacity: 0.6,
-      strokeWidth: 1,
-    },
-    markerEnd: {
-      type: MarkerType.ArrowClosed,
-      width: 10,
-      height: 10,
-      color: edgeColor,
-    },
-  }));
+  const edges: Edge[] = rawEdges.map((e, i) => {
+    const isHighlighted = retrievedSet.has(e.source) || retrievedSet.has(e.target);
+    const edgeColor = isHighlighted
+      ? "hsl(var(--terminal-green))"
+      : isDark
+        ? "hsl(215 20% 40%)"
+        : "hsl(214 32% 75%)";
+
+    return {
+      id: e.id || `edge-${i}`,
+      source: e.source,
+      target: e.target,
+      style: {
+        stroke: edgeColor,
+        opacity: isHighlighted ? 0.9 : 0.45,
+        strokeWidth: isHighlighted ? 1.8 : 1,
+      },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        width: 10,
+        height: 10,
+        color: edgeColor,
+      },
+    };
+  });
 
   return { nodes, edges };
 }
 
-export function KnowledgeGraphPanel() {
+export function KnowledgeGraphPanel({
+  retrievedDocumentIds = [],
+}: {
+  retrievedDocumentIds?: string[];
+}) {
   const [isDark, setIsDark] = useState(false);
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains("dark"));
@@ -112,10 +138,12 @@ export function KnowledgeGraphPanel() {
     staleTime: 30_000,
   });
 
+  const retrievedSet = useMemo(() => new Set(retrievedDocumentIds), [retrievedDocumentIds]);
+
   const { nodes, edges } = useMemo(() => {
     if (!query.data) return { nodes: [], edges: [] };
-    return layoutGraph(query.data, isDark);
-  }, [query.data, isDark]);
+    return layoutGraph(query.data, isDark, retrievedSet);
+  }, [query.data, isDark, retrievedSet]);
 
   const [rfNodes, setNodes] = useNodesState([]);
   const [rfEdges, setEdges] = useEdgesState([]);
@@ -127,6 +155,10 @@ export function KnowledgeGraphPanel() {
   // Type legend
   const typeSet = new Set(query.data?.nodes?.map((n) => n.type) ?? []);
   const legendTypes = [...typeSet].slice(0, 5);
+
+  const nodeCount = query.data?.nodes?.length ?? 0;
+  const edgeCount = query.data?.edges?.length ?? 0;
+  const activeRetrievedCount = retrievedDocumentIds.length;
 
   return (
     <div className="terminal-window flex h-[400px] flex-col rounded-xl overflow-hidden">
@@ -143,9 +175,16 @@ export function KnowledgeGraphPanel() {
           INTELLIGENCE NETWORK
         </p>
         {query.data && (
-          <p className="font-mono text-[9px] text-muted-foreground/40">
-            {query.data.nodes?.length ?? 0} NODES · {query.data.edges?.length ?? 0} EDGES
-          </p>
+          <div className="flex items-center gap-2 font-mono text-[9px]">
+            {activeRetrievedCount > 0 && (
+              <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-emerald-400 border border-emerald-500/30">
+                {activeRetrievedCount} IN MISSION
+              </span>
+            )}
+            <span className="text-muted-foreground/60">
+              {nodeCount} NODES · {edgeCount} EDGES
+            </span>
+          </div>
         )}
       </div>
 

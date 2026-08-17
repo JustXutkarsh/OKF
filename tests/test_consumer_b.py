@@ -35,6 +35,8 @@ from consumer_b.retriever import select
 from consumer_b.service import ConsumerService
 from consumer_b.verifier import verify_conflicts
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
 
 def FIXED_CLOCK() -> datetime:
     return datetime(2026, 8, 6, 12, 0, 0, tzinfo=UTC)
@@ -230,6 +232,45 @@ class RetrievalTests(unittest.TestCase):
         self.assertEqual(report.retrieval.selected_count, len(report.documents_used))
         self.assertEqual(report.retrieval.selected_documents, report.documents_used)
         self.assertGreaterEqual(report.retrieval.retrieval_time_ms, 0)
+
+    def test_five_theatre_multi_topic_decomposition(self) -> None:
+        from consumer_b.reader import scan_catalog
+
+        catalog = scan_catalog(REPO_ROOT / "okf")
+        q = (
+            "Assess the risk of a major geopolitical escalation involving Taiwan, the Strait of "
+            "Hormuz, Gaza, Israel-Lebanon, and India-China. Rank the five situations by escalation "
+            "risk using only evidence available in the OKF bundle, explain your reasoning, and "
+            "identify where the bundle lacks sufficient evidence."
+        )
+        res = select(catalog, q, max_docs=3)
+        selected_ids = [d.id for d in res.selected]
+        self.assertGreaterEqual(len(selected_ids), 10)
+
+        # Confirm representation from every single requested theatre
+        has_taiwan = any("taiwan" in doc_id for doc_id in selected_ids)
+        has_hormuz = any("hormuz" in doc_id or "irgc" in doc_id for doc_id in selected_ids)
+        has_gaza = any("gaza" in doc_id or "hamas" in doc_id for doc_id in selected_ids)
+        has_lebanon = any("lebanon" in doc_id or "hezbollah" in doc_id for doc_id in selected_ids)
+        has_india_china = any("india" in doc_id or "arunachal" in doc_id for doc_id in selected_ids)
+
+        self.assertTrue(has_taiwan, "Taiwan documents missing from multi-theatre retrieval")
+        self.assertTrue(has_hormuz, "Hormuz documents missing from multi-theatre retrieval")
+        self.assertTrue(has_gaza, "Gaza documents missing from multi-theatre retrieval")
+        self.assertTrue(
+            has_lebanon, "Israel-Lebanon documents missing from multi-theatre retrieval"
+        )
+        self.assertTrue(
+            has_india_china, "India-China documents missing from multi-theatre retrieval"
+        )
+
+    def test_uncovered_query_returns_empty_selection(self) -> None:
+        from consumer_b.reader import scan_catalog
+
+        catalog = scan_catalog(REPO_ROOT / "okf")
+        q = "What are the lithium extraction royalty rates in Salar de Atacama?"
+        res = select(catalog, q, max_docs=3)
+        self.assertEqual(len(res.selected), 0)
 
 
 class VerifierTests(unittest.TestCase):

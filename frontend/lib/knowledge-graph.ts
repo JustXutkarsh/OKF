@@ -98,25 +98,61 @@ export function buildGraph(
   return { nodes, edges, errors };
 }
 
-/** Server-side bundle scan. Never throws; missing dir yields empty graph. */
-export function loadBundleGraph(bundlePath?: string): KnowledgeGraph {
-  const root = resolve(bundlePath ?? process.env.OKF_BUNDLE_PATH ?? join(process.cwd(), "..", "okf"));
-  if (!existsSync(root)) return { nodes: [], edges: [], errors: [`bundle not found at ${root}`] };
+import bundleGraphData from "./bundle-graph.json";
 
-  const docs: { path: string; content: string }[] = [];
-  const walk = (dir: string) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const full = join(dir, entry.name);
-      if (entry.isDirectory()) walk(full);
-      else if (entry.isFile() && entry.name.endsWith(".md")) {
-        docs.push({ path: full, content: readFileSync(full, "utf-8") });
+/** Server-side bundle scan. Never throws; falls back to bundled concept graph if filesystem is absent. */
+export function loadBundleGraph(bundlePath?: string): KnowledgeGraph {
+  if (bundlePath) {
+    const root = resolve(bundlePath);
+    if (!existsSync(root)) return { nodes: [], edges: [], errors: [`bundle not found at ${root}`] };
+    const docs: { path: string; content: string }[] = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (entry.isFile() && entry.name.endsWith(".md")) {
+          docs.push({ path: full, content: readFileSync(full, "utf-8") });
+        }
+      }
+    };
+    try {
+      walk(root);
+    } catch (err) {
+      return { nodes: [], edges: [], errors: [`bundle read failed: ${String(err)}`] };
+    }
+    return buildGraph(docs);
+  }
+
+  // Auto-discover bundle root from known candidate paths
+  const candidates = [
+    process.env.OKF_BUNDLE_PATH,
+    join(process.cwd(), "..", "okf"),
+    join(process.cwd(), "okf"),
+  ].filter(Boolean) as string[];
+
+  for (const candidate of candidates) {
+    const root = resolve(candidate);
+    if (existsSync(root)) {
+      const docs: { path: string; content: string }[] = [];
+      const walk = (dir: string) => {
+        for (const entry of readdirSync(dir, { withFileTypes: true })) {
+          const full = join(dir, entry.name);
+          if (entry.isDirectory()) walk(full);
+          else if (entry.isFile() && entry.name.endsWith(".md")) {
+            docs.push({ path: full, content: readFileSync(full, "utf-8") });
+          }
+        }
+      };
+      try {
+        walk(root);
+        const graph = buildGraph(docs);
+        if (graph.nodes.length > 0) return graph;
+      } catch {
+        // Fall through to next candidate or fallback
       }
     }
-  };
-  try {
-    walk(root);
-  } catch (err) {
-    return { nodes: [], edges: [], errors: [`bundle read failed: ${String(err)}`] };
   }
-  return buildGraph(docs);
+
+  // Serverless / Vercel fallback: return the validated bundle knowledge graph
+  return bundleGraphData as KnowledgeGraph;
 }

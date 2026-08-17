@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildGraph } from "@/lib/knowledge-graph";
+import { buildGraph, loadBundleGraph } from "@/lib/knowledge-graph";
 
 const NATO = `---
 schema_version: 1
@@ -50,5 +50,18 @@ describe("buildGraph", () => {
     expect(g.nodes).toHaveLength(0);
     expect(g.errors).toHaveLength(1);
     expect(g.errors[0]).toContain("bad.md");
+  });
+
+  it("loadBundleGraph returns non-empty graph (> 30 nodes, > 50 edges) for production bundle", () => {
+    const g = loadBundleGraph();
+    expect(g.nodes.length).toBeGreaterThan(30);
+    expect(g.edges.length).toBeGreaterThan(50);
+  });
+
+  it("loadBundleGraph returns empty graph with error when explicit invalid path is provided", () => {
+    const g = loadBundleGraph("/nonexistent/custom/path");
+    expect(g.nodes).toHaveLength(0);
+    expect(g.edges).toHaveLength(0);
+    expect(g.errors.length).toBeGreaterThan(0);
   });
 });

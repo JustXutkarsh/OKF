@@ -1,0 +1,939 @@
+{
+  "nodes": [
+    {
+      "id": "hamas-military-political-structure",
+      "title": "Hamas Political and Military Structure",
+      "type": "actors",
+      "resource": "actors",
+      "confidence": "verified"
+    },
+    {
+      "id": "hezbollah-military-arsenal-posture",
+      "title": "Hezbollah Military Arsenal and Operational Posture",
+      "type": "actors",
+      "resource": "actors",
+      "confidence": "verified"
+    },
+    {
+      "id": "irgc-navy-gulf-posture",
+      "title": "IRGC Navy Gulf Military Posture",
+      "type": "actors",
+      "resource": "actors",
+      "confidence": "verified"
+    },
+    {
+      "id": "nato",
+      "title": "NATO",
+      "type": "actors",
+      "resource": "actors",
+      "confidence": "verified"
+    },
+    {
+      "id": "pla-border-defense-infrastructure",
+      "title": "PLA Border Defense Posture and Xiaokang Model Villages",
+      "type": "actors",
+      "resource": "actors",
+      "confidence": "verified"
+    },
+    {
+      "id": "pla-eastern-theater-command",
+      "title": "PLA Eastern Theater Command Cross-Strait Posture",
+      "type": "actors",
+      "resource": "actors",
+      "confidence": "verified"
+    },
+    {
+      "id": "taiwan-armed-forces-defense-posture",
+      "title": "Taiwan Armed Forces Asymmetric Defense Posture",
+      "type": "actors",
+      "resource": "actors",
+      "confidence": "verified"
+    },
+    {
+      "id": "gaza-humanitarian-crisis-infrastructure",
+      "title": "Gaza Humanitarian Crisis and Infrastructure Breakdown",
+      "type": "conflicts",
+      "resource": "conflicts",
+      "confidence": "verified"
+    },
+    {
+      "id": "gaza-military-operations-security",
+      "title": "Gaza Military Operations and Security Control",
+      "type": "conflicts",
+      "resource": "conflicts",
+      "confidence": "mixed"
+    },
+    {
+      "id": "india-china-lac-eastern-sector",
+      "title": "India-China LAC Tensions in the Eastern Sector",
+      "type": "conflicts",
+      "resource": "conflicts",
+      "confidence": "mixed"
+    },
+    {
+      "id": "iran-israel-regional-deterrence",
+      "title": "Iran-Israel Regional Deterrence and Standoff",
+      "type": "conflicts",
+      "resource": "conflicts",
+      "confidence": "mixed"
+    },
+    {
+      "id": "israel-lebanon-border-conflict",
+      "title": "Israel-Lebanon Border Conflict and Escalation",
+      "type": "conflicts",
+      "resource": "conflicts",
+      "confidence": "mixed"
+    },
+    {
+      "id": "red-sea-shipping-disruption",
+      "title": "Red Sea Shipping Disruption",
+      "type": "conflicts",
+      "resource": "conflicts",
+      "confidence": "verified"
+    },
+    {
+      "id": "strait-of-hormuz-maritime-tensions",
+      "title": "Strait of Hormuz Maritime Tensions",
+      "type": "conflicts",
+      "resource": "conflicts",
+      "confidence": "mixed"
+    },
+    {
+      "id": "taiwan-blockade-quarantine-scenarios",
+      "title": "Taiwan Maritime Blockade and Quarantine Scenarios",
+      "type": "conflicts",
+      "resource": "conflicts",
+      "confidence": "mixed"
+    },
+    {
+      "id": "taiwan-strait-military-tensions",
+      "title": "Taiwan Strait Military Tensions and Exercises",
+      "type": "conflicts",
+      "resource": "conflicts",
+      "confidence": "mixed"
+    },
+    {
+      "id": "ukraine-russia-frontline",
+      "title": "Ukraine-Russia Frontline",
+      "type": "conflicts",
+      "resource": "conflicts",
+      "confidence": "verified"
+    },
+    {
+      "id": "hormuz-oil-transit-chokepoint",
+      "title": "Strait of Hormuz Global Energy Transit Risk",
+      "type": "economics",
+      "resource": "economics",
+      "confidence": "verified"
+    },
+    {
+      "id": "taiwan-semiconductor-global-supply-chain",
+      "title": "Taiwan Semiconductor Dominance and Global Supply Chain Risk",
+      "type": "economics",
+      "resource": "economics",
+      "confidence": "verified"
+    },
+    {
+      "id": "us-china-tariffs",
+      "title": "US-China Tariffs",
+      "type": "economics",
+      "resource": "economics",
+      "confidence": "verified"
+    },
+    {
+      "id": "arunachal-pradesh-territorial-dispute",
+      "title": "Indian Sovereignty and Territorial Integrity in Arunachal Pradesh",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "china-taiwan-reunification-policy",
+      "title": "Beijing Cross-Strait Policy and Sovereignty Claims",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "china-zangnan-sovereignty-claims",
+      "title": "Chinese Sovereignty Claims and Standardization of Zangnan Names",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "gaza-ceasefire-hostage-negotiations",
+      "title": "Gaza Ceasefire and Hostage Exchange Negotiations",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "mixed"
+    },
+    {
+      "id": "gulf-states-iran-diplomatic-posture",
+      "title": "Gulf States Diplomatic Engagement with Iran",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "india-border-infrastructure-development",
+      "title": "India Border Infrastructure Development in Arunachal Pradesh",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "india-china-diplomatic-border-negotiations",
+      "title": "India-China Working Mechanism for Consultation on Border Affairs",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "indo-pacific-taiwan-regional-alignment",
+      "title": "Indo-Pacific Regional Security Alignment on Taiwan Strait",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "international-positions-arunachal-pradesh",
+      "title": "International and Legal Perspectives on Arunachal Pradesh and McMahon Line",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "iran-nuclear-enrichment-sanctions",
+      "title": "Iran Nuclear Enrichment and Sanctions Pressure",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "israel-gaza-war-objectives",
+      "title": "Israeli War Objectives and Post-Conflict Strategy",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "israel-northern-border-security-doctrine",
+      "title": "Israel Northern Border Security Doctrine and Buffer Demands",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "lebanese-government-armed-forces-posture",
+      "title": "Lebanese Government and Armed Forces Border Posture",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "palestinian-authority-post-war-governance",
+      "title": "Palestinian Authority and Regional Post-Conflict Stabilization Plans",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "mixed"
+    },
+    {
+      "id": "unscr-1701-disarmament-framework",
+      "title": "UNSCR 1701 and Armed Group Disarmament Framework",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "us-diplomatic-involvement-gaza",
+      "title": "US Diplomatic and Security Policy on Gaza Conflict",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "us-export-controls-semiconductors",
+      "title": "US Semiconductor Export Controls",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "us-fifth-fleet-maritime-security",
+      "title": "US Fifth Fleet and IMSC Maritime Operations",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "us-france-lebanon-diplomatic-mediation",
+      "title": "US and French Diplomatic Initiatives on Lebanon Border",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "mixed"
+    },
+    {
+      "id": "us-iran-diplomatic-deterrence-strategy",
+      "title": "US Strategic Deterrence and Sanctions Policy toward Iran",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    },
+    {
+      "id": "us-taiwan-relations-deterrence",
+      "title": "US Taiwan Policy and Deterrence Architecture",
+      "type": "policy",
+      "resource": "policy",
+      "confidence": "verified"
+    }
+  ],
+  "edges": [
+    {
+      "id": "hamas-military-political-structure->gaza-military-operations-security",
+      "source": "hamas-military-political-structure",
+      "target": "gaza-military-operations-security"
+    },
+    {
+      "id": "hamas-military-political-structure->gaza-ceasefire-hostage-negotiations",
+      "source": "hamas-military-political-structure",
+      "target": "gaza-ceasefire-hostage-negotiations"
+    },
+    {
+      "id": "hamas-military-political-structure->israel-gaza-war-objectives",
+      "source": "hamas-military-political-structure",
+      "target": "israel-gaza-war-objectives"
+    },
+    {
+      "id": "hamas-military-political-structure->palestinian-authority-post-war-governance",
+      "source": "hamas-military-political-structure",
+      "target": "palestinian-authority-post-war-governance"
+    },
+    {
+      "id": "hezbollah-military-arsenal-posture->israel-lebanon-border-conflict",
+      "source": "hezbollah-military-arsenal-posture",
+      "target": "israel-lebanon-border-conflict"
+    },
+    {
+      "id": "hezbollah-military-arsenal-posture->unscr-1701-disarmament-framework",
+      "source": "hezbollah-military-arsenal-posture",
+      "target": "unscr-1701-disarmament-framework"
+    },
+    {
+      "id": "hezbollah-military-arsenal-posture->israel-northern-border-security-doctrine",
+      "source": "hezbollah-military-arsenal-posture",
+      "target": "israel-northern-border-security-doctrine"
+    },
+    {
+      "id": "irgc-navy-gulf-posture->strait-of-hormuz-maritime-tensions",
+      "source": "irgc-navy-gulf-posture",
+      "target": "strait-of-hormuz-maritime-tensions"
+    },
+    {
+      "id": "irgc-navy-gulf-posture->us-fifth-fleet-maritime-security",
+      "source": "irgc-navy-gulf-posture",
+      "target": "us-fifth-fleet-maritime-security"
+    },
+    {
+      "id": "irgc-navy-gulf-posture->hormuz-oil-transit-chokepoint",
+      "source": "irgc-navy-gulf-posture",
+      "target": "hormuz-oil-transit-chokepoint"
+    },
+    {
+      "id": "nato->ukraine-russia-frontline",
+      "source": "nato",
+      "target": "ukraine-russia-frontline"
+    },
+    {
+      "id": "pla-border-defense-infrastructure->india-china-lac-eastern-sector",
+      "source": "pla-border-defense-infrastructure",
+      "target": "india-china-lac-eastern-sector"
+    },
+    {
+      "id": "pla-border-defense-infrastructure->china-zangnan-sovereignty-claims",
+      "source": "pla-border-defense-infrastructure",
+      "target": "china-zangnan-sovereignty-claims"
+    },
+    {
+      "id": "pla-border-defense-infrastructure->india-border-infrastructure-development",
+      "source": "pla-border-defense-infrastructure",
+      "target": "india-border-infrastructure-development"
+    },
+    {
+      "id": "pla-eastern-theater-command->taiwan-strait-military-tensions",
+      "source": "pla-eastern-theater-command",
+      "target": "taiwan-strait-military-tensions"
+    },
+    {
+      "id": "pla-eastern-theater-command->taiwan-blockade-quarantine-scenarios",
+      "source": "pla-eastern-theater-command",
+      "target": "taiwan-blockade-quarantine-scenarios"
+    },
+    {
+      "id": "pla-eastern-theater-command->china-taiwan-reunification-policy",
+      "source": "pla-eastern-theater-command",
+      "target": "china-taiwan-reunification-policy"
+    },
+    {
+      "id": "taiwan-armed-forces-defense-posture->taiwan-strait-military-tensions",
+      "source": "taiwan-armed-forces-defense-posture",
+      "target": "taiwan-strait-military-tensions"
+    },
+    {
+      "id": "taiwan-armed-forces-defense-posture->taiwan-blockade-quarantine-scenarios",
+      "source": "taiwan-armed-forces-defense-posture",
+      "target": "taiwan-blockade-quarantine-scenarios"
+    },
+    {
+      "id": "taiwan-armed-forces-defense-posture->us-taiwan-relations-deterrence",
+      "source": "taiwan-armed-forces-defense-posture",
+      "target": "us-taiwan-relations-deterrence"
+    },
+    {
+      "id": "gaza-humanitarian-crisis-infrastructure->gaza-military-operations-security",
+      "source": "gaza-humanitarian-crisis-infrastructure",
+      "target": "gaza-military-operations-security"
+    },
+    {
+      "id": "gaza-humanitarian-crisis-infrastructure->gaza-ceasefire-hostage-negotiations",
+      "source": "gaza-humanitarian-crisis-infrastructure",
+      "target": "gaza-ceasefire-hostage-negotiations"
+    },
+    {
+      "id": "gaza-humanitarian-crisis-infrastructure->us-diplomatic-involvement-gaza",
+      "source": "gaza-humanitarian-crisis-infrastructure",
+      "target": "us-diplomatic-involvement-gaza"
+    },
+    {
+      "id": "gaza-military-operations-security->hamas-military-political-structure",
+      "source": "gaza-military-operations-security",
+      "target": "hamas-military-political-structure"
+    },
+    {
+      "id": "gaza-military-operations-security->israel-gaza-war-objectives",
+      "source": "gaza-military-operations-security",
+      "target": "israel-gaza-war-objectives"
+    },
+    {
+      "id": "gaza-military-operations-security->gaza-ceasefire-hostage-negotiations",
+      "source": "gaza-military-operations-security",
+      "target": "gaza-ceasefire-hostage-negotiations"
+    },
+    {
+      "id": "gaza-military-operations-security->gaza-humanitarian-crisis-infrastructure",
+      "source": "gaza-military-operations-security",
+      "target": "gaza-humanitarian-crisis-infrastructure"
+    },
+    {
+      "id": "india-china-lac-eastern-sector->arunachal-pradesh-territorial-dispute",
+      "source": "india-china-lac-eastern-sector",
+      "target": "arunachal-pradesh-territorial-dispute"
+    },
+    {
+      "id": "india-china-lac-eastern-sector->china-zangnan-sovereignty-claims",
+      "source": "india-china-lac-eastern-sector",
+      "target": "china-zangnan-sovereignty-claims"
+    },
+    {
+      "id": "india-china-lac-eastern-sector->india-border-infrastructure-development",
+      "source": "india-china-lac-eastern-sector",
+      "target": "india-border-infrastructure-development"
+    },
+    {
+      "id": "india-china-lac-eastern-sector->pla-border-defense-infrastructure",
+      "source": "india-china-lac-eastern-sector",
+      "target": "pla-border-defense-infrastructure"
+    },
+    {
+      "id": "india-china-lac-eastern-sector->india-china-diplomatic-border-negotiations",
+      "source": "india-china-lac-eastern-sector",
+      "target": "india-china-diplomatic-border-negotiations"
+    },
+    {
+      "id": "iran-israel-regional-deterrence->strait-of-hormuz-maritime-tensions",
+      "source": "iran-israel-regional-deterrence",
+      "target": "strait-of-hormuz-maritime-tensions"
+    },
+    {
+      "id": "iran-israel-regional-deterrence->iran-nuclear-enrichment-sanctions",
+      "source": "iran-israel-regional-deterrence",
+      "target": "iran-nuclear-enrichment-sanctions"
+    },
+    {
+      "id": "iran-israel-regional-deterrence->us-iran-diplomatic-deterrence-strategy",
+      "source": "iran-israel-regional-deterrence",
+      "target": "us-iran-diplomatic-deterrence-strategy"
+    },
+    {
+      "id": "iran-israel-regional-deterrence->israel-lebanon-border-conflict",
+      "source": "iran-israel-regional-deterrence",
+      "target": "israel-lebanon-border-conflict"
+    },
+    {
+      "id": "israel-lebanon-border-conflict->hezbollah-military-arsenal-posture",
+      "source": "israel-lebanon-border-conflict",
+      "target": "hezbollah-military-arsenal-posture"
+    },
+    {
+      "id": "israel-lebanon-border-conflict->unscr-1701-disarmament-framework",
+      "source": "israel-lebanon-border-conflict",
+      "target": "unscr-1701-disarmament-framework"
+    },
+    {
+      "id": "israel-lebanon-border-conflict->israel-northern-border-security-doctrine",
+      "source": "israel-lebanon-border-conflict",
+      "target": "israel-northern-border-security-doctrine"
+    },
+    {
+      "id": "israel-lebanon-border-conflict->us-france-lebanon-diplomatic-mediation",
+      "source": "israel-lebanon-border-conflict",
+      "target": "us-france-lebanon-diplomatic-mediation"
+    },
+    {
+      "id": "red-sea-shipping-disruption->us-china-tariffs",
+      "source": "red-sea-shipping-disruption",
+      "target": "us-china-tariffs"
+    },
+    {
+      "id": "strait-of-hormuz-maritime-tensions->hormuz-oil-transit-chokepoint",
+      "source": "strait-of-hormuz-maritime-tensions",
+      "target": "hormuz-oil-transit-chokepoint"
+    },
+    {
+      "id": "strait-of-hormuz-maritime-tensions->irgc-navy-gulf-posture",
+      "source": "strait-of-hormuz-maritime-tensions",
+      "target": "irgc-navy-gulf-posture"
+    },
+    {
+      "id": "strait-of-hormuz-maritime-tensions->us-fifth-fleet-maritime-security",
+      "source": "strait-of-hormuz-maritime-tensions",
+      "target": "us-fifth-fleet-maritime-security"
+    },
+    {
+      "id": "strait-of-hormuz-maritime-tensions->iran-israel-regional-deterrence",
+      "source": "strait-of-hormuz-maritime-tensions",
+      "target": "iran-israel-regional-deterrence"
+    },
+    {
+      "id": "taiwan-blockade-quarantine-scenarios->taiwan-strait-military-tensions",
+      "source": "taiwan-blockade-quarantine-scenarios",
+      "target": "taiwan-strait-military-tensions"
+    },
+    {
+      "id": "taiwan-blockade-quarantine-scenarios->pla-eastern-theater-command",
+      "source": "taiwan-blockade-quarantine-scenarios",
+      "target": "pla-eastern-theater-command"
+    },
+    {
+      "id": "taiwan-blockade-quarantine-scenarios->taiwan-semiconductor-global-supply-chain",
+      "source": "taiwan-blockade-quarantine-scenarios",
+      "target": "taiwan-semiconductor-global-supply-chain"
+    },
+    {
+      "id": "taiwan-blockade-quarantine-scenarios->us-taiwan-relations-deterrence",
+      "source": "taiwan-blockade-quarantine-scenarios",
+      "target": "us-taiwan-relations-deterrence"
+    },
+    {
+      "id": "taiwan-strait-military-tensions->pla-eastern-theater-command",
+      "source": "taiwan-strait-military-tensions",
+      "target": "pla-eastern-theater-command"
+    },
+    {
+      "id": "taiwan-strait-military-tensions->taiwan-armed-forces-defense-posture",
+      "source": "taiwan-strait-military-tensions",
+      "target": "taiwan-armed-forces-defense-posture"
+    },
+    {
+      "id": "taiwan-strait-military-tensions->taiwan-blockade-quarantine-scenarios",
+      "source": "taiwan-strait-military-tensions",
+      "target": "taiwan-blockade-quarantine-scenarios"
+    },
+    {
+      "id": "taiwan-strait-military-tensions->us-taiwan-relations-deterrence",
+      "source": "taiwan-strait-military-tensions",
+      "target": "us-taiwan-relations-deterrence"
+    },
+    {
+      "id": "ukraine-russia-frontline->nato",
+      "source": "ukraine-russia-frontline",
+      "target": "nato"
+    },
+    {
+      "id": "hormuz-oil-transit-chokepoint->strait-of-hormuz-maritime-tensions",
+      "source": "hormuz-oil-transit-chokepoint",
+      "target": "strait-of-hormuz-maritime-tensions"
+    },
+    {
+      "id": "hormuz-oil-transit-chokepoint->irgc-navy-gulf-posture",
+      "source": "hormuz-oil-transit-chokepoint",
+      "target": "irgc-navy-gulf-posture"
+    },
+    {
+      "id": "hormuz-oil-transit-chokepoint->us-fifth-fleet-maritime-security",
+      "source": "hormuz-oil-transit-chokepoint",
+      "target": "us-fifth-fleet-maritime-security"
+    },
+    {
+      "id": "taiwan-semiconductor-global-supply-chain->us-export-controls-semiconductors",
+      "source": "taiwan-semiconductor-global-supply-chain",
+      "target": "us-export-controls-semiconductors"
+    },
+    {
+      "id": "taiwan-semiconductor-global-supply-chain->taiwan-strait-military-tensions",
+      "source": "taiwan-semiconductor-global-supply-chain",
+      "target": "taiwan-strait-military-tensions"
+    },
+    {
+      "id": "taiwan-semiconductor-global-supply-chain->taiwan-blockade-quarantine-scenarios",
+      "source": "taiwan-semiconductor-global-supply-chain",
+      "target": "taiwan-blockade-quarantine-scenarios"
+    },
+    {
+      "id": "us-china-tariffs->us-export-controls-semiconductors",
+      "source": "us-china-tariffs",
+      "target": "us-export-controls-semiconductors"
+    },
+    {
+      "id": "arunachal-pradesh-territorial-dispute->india-china-lac-eastern-sector",
+      "source": "arunachal-pradesh-territorial-dispute",
+      "target": "india-china-lac-eastern-sector"
+    },
+    {
+      "id": "arunachal-pradesh-territorial-dispute->china-zangnan-sovereignty-claims",
+      "source": "arunachal-pradesh-territorial-dispute",
+      "target": "china-zangnan-sovereignty-claims"
+    },
+    {
+      "id": "arunachal-pradesh-territorial-dispute->india-border-infrastructure-development",
+      "source": "arunachal-pradesh-territorial-dispute",
+      "target": "india-border-infrastructure-development"
+    },
+    {
+      "id": "arunachal-pradesh-territorial-dispute->international-positions-arunachal-pradesh",
+      "source": "arunachal-pradesh-territorial-dispute",
+      "target": "international-positions-arunachal-pradesh"
+    },
+    {
+      "id": "china-taiwan-reunification-policy->taiwan-strait-military-tensions",
+      "source": "china-taiwan-reunification-policy",
+      "target": "taiwan-strait-military-tensions"
+    },
+    {
+      "id": "china-taiwan-reunification-policy->pla-eastern-theater-command",
+      "source": "china-taiwan-reunification-policy",
+      "target": "pla-eastern-theater-command"
+    },
+    {
+      "id": "china-taiwan-reunification-policy->us-taiwan-relations-deterrence",
+      "source": "china-taiwan-reunification-policy",
+      "target": "us-taiwan-relations-deterrence"
+    },
+    {
+      "id": "china-zangnan-sovereignty-claims->arunachal-pradesh-territorial-dispute",
+      "source": "china-zangnan-sovereignty-claims",
+      "target": "arunachal-pradesh-territorial-dispute"
+    },
+    {
+      "id": "china-zangnan-sovereignty-claims->india-china-lac-eastern-sector",
+      "source": "china-zangnan-sovereignty-claims",
+      "target": "india-china-lac-eastern-sector"
+    },
+    {
+      "id": "china-zangnan-sovereignty-claims->international-positions-arunachal-pradesh",
+      "source": "china-zangnan-sovereignty-claims",
+      "target": "international-positions-arunachal-pradesh"
+    },
+    {
+      "id": "gaza-ceasefire-hostage-negotiations->gaza-military-operations-security",
+      "source": "gaza-ceasefire-hostage-negotiations",
+      "target": "gaza-military-operations-security"
+    },
+    {
+      "id": "gaza-ceasefire-hostage-negotiations->israel-gaza-war-objectives",
+      "source": "gaza-ceasefire-hostage-negotiations",
+      "target": "israel-gaza-war-objectives"
+    },
+    {
+      "id": "gaza-ceasefire-hostage-negotiations->hamas-military-political-structure",
+      "source": "gaza-ceasefire-hostage-negotiations",
+      "target": "hamas-military-political-structure"
+    },
+    {
+      "id": "gaza-ceasefire-hostage-negotiations->us-diplomatic-involvement-gaza",
+      "source": "gaza-ceasefire-hostage-negotiations",
+      "target": "us-diplomatic-involvement-gaza"
+    },
+    {
+      "id": "gulf-states-iran-diplomatic-posture->strait-of-hormuz-maritime-tensions",
+      "source": "gulf-states-iran-diplomatic-posture",
+      "target": "strait-of-hormuz-maritime-tensions"
+    },
+    {
+      "id": "gulf-states-iran-diplomatic-posture->us-iran-diplomatic-deterrence-strategy",
+      "source": "gulf-states-iran-diplomatic-posture",
+      "target": "us-iran-diplomatic-deterrence-strategy"
+    },
+    {
+      "id": "gulf-states-iran-diplomatic-posture->iran-israel-regional-deterrence",
+      "source": "gulf-states-iran-diplomatic-posture",
+      "target": "iran-israel-regional-deterrence"
+    },
+    {
+      "id": "india-border-infrastructure-development->arunachal-pradesh-territorial-dispute",
+      "source": "india-border-infrastructure-development",
+      "target": "arunachal-pradesh-territorial-dispute"
+    },
+    {
+      "id": "india-border-infrastructure-development->india-china-lac-eastern-sector",
+      "source": "india-border-infrastructure-development",
+      "target": "india-china-lac-eastern-sector"
+    },
+    {
+      "id": "india-border-infrastructure-development->pla-border-defense-infrastructure",
+      "source": "india-border-infrastructure-development",
+      "target": "pla-border-defense-infrastructure"
+    },
+    {
+      "id": "india-china-diplomatic-border-negotiations->india-china-lac-eastern-sector",
+      "source": "india-china-diplomatic-border-negotiations",
+      "target": "india-china-lac-eastern-sector"
+    },
+    {
+      "id": "india-china-diplomatic-border-negotiations->arunachal-pradesh-territorial-dispute",
+      "source": "india-china-diplomatic-border-negotiations",
+      "target": "arunachal-pradesh-territorial-dispute"
+    },
+    {
+      "id": "india-china-diplomatic-border-negotiations->international-positions-arunachal-pradesh",
+      "source": "india-china-diplomatic-border-negotiations",
+      "target": "international-positions-arunachal-pradesh"
+    },
+    {
+      "id": "indo-pacific-taiwan-regional-alignment->us-taiwan-relations-deterrence",
+      "source": "indo-pacific-taiwan-regional-alignment",
+      "target": "us-taiwan-relations-deterrence"
+    },
+    {
+      "id": "indo-pacific-taiwan-regional-alignment->taiwan-strait-military-tensions",
+      "source": "indo-pacific-taiwan-regional-alignment",
+      "target": "taiwan-strait-military-tensions"
+    },
+    {
+      "id": "indo-pacific-taiwan-regional-alignment->pla-eastern-theater-command",
+      "source": "indo-pacific-taiwan-regional-alignment",
+      "target": "pla-eastern-theater-command"
+    },
+    {
+      "id": "international-positions-arunachal-pradesh->arunachal-pradesh-territorial-dispute",
+      "source": "international-positions-arunachal-pradesh",
+      "target": "arunachal-pradesh-territorial-dispute"
+    },
+    {
+      "id": "international-positions-arunachal-pradesh->china-zangnan-sovereignty-claims",
+      "source": "international-positions-arunachal-pradesh",
+      "target": "china-zangnan-sovereignty-claims"
+    },
+    {
+      "id": "international-positions-arunachal-pradesh->india-china-diplomatic-border-negotiations",
+      "source": "international-positions-arunachal-pradesh",
+      "target": "india-china-diplomatic-border-negotiations"
+    },
+    {
+      "id": "iran-nuclear-enrichment-sanctions->us-iran-diplomatic-deterrence-strategy",
+      "source": "iran-nuclear-enrichment-sanctions",
+      "target": "us-iran-diplomatic-deterrence-strategy"
+    },
+    {
+      "id": "iran-nuclear-enrichment-sanctions->iran-israel-regional-deterrence",
+      "source": "iran-nuclear-enrichment-sanctions",
+      "target": "iran-israel-regional-deterrence"
+    },
+    {
+      "id": "iran-nuclear-enrichment-sanctions->strait-of-hormuz-maritime-tensions",
+      "source": "iran-nuclear-enrichment-sanctions",
+      "target": "strait-of-hormuz-maritime-tensions"
+    },
+    {
+      "id": "israel-gaza-war-objectives->gaza-military-operations-security",
+      "source": "israel-gaza-war-objectives",
+      "target": "gaza-military-operations-security"
+    },
+    {
+      "id": "israel-gaza-war-objectives->gaza-ceasefire-hostage-negotiations",
+      "source": "israel-gaza-war-objectives",
+      "target": "gaza-ceasefire-hostage-negotiations"
+    },
+    {
+      "id": "israel-gaza-war-objectives->us-diplomatic-involvement-gaza",
+      "source": "israel-gaza-war-objectives",
+      "target": "us-diplomatic-involvement-gaza"
+    },
+    {
+      "id": "israel-northern-border-security-doctrine->israel-lebanon-border-conflict",
+      "source": "israel-northern-border-security-doctrine",
+      "target": "israel-lebanon-border-conflict"
+    },
+    {
+      "id": "israel-northern-border-security-doctrine->hezbollah-military-arsenal-posture",
+      "source": "israel-northern-border-security-doctrine",
+      "target": "hezbollah-military-arsenal-posture"
+    },
+    {
+      "id": "israel-northern-border-security-doctrine->unscr-1701-disarmament-framework",
+      "source": "israel-northern-border-security-doctrine",
+      "target": "unscr-1701-disarmament-framework"
+    },
+    {
+      "id": "lebanese-government-armed-forces-posture->unscr-1701-disarmament-framework",
+      "source": "lebanese-government-armed-forces-posture",
+      "target": "unscr-1701-disarmament-framework"
+    },
+    {
+      "id": "lebanese-government-armed-forces-posture->israel-lebanon-border-conflict",
+      "source": "lebanese-government-armed-forces-posture",
+      "target": "israel-lebanon-border-conflict"
+    },
+    {
+      "id": "lebanese-government-armed-forces-posture->us-france-lebanon-diplomatic-mediation",
+      "source": "lebanese-government-armed-forces-posture",
+      "target": "us-france-lebanon-diplomatic-mediation"
+    },
+    {
+      "id": "palestinian-authority-post-war-governance->hamas-military-political-structure",
+      "source": "palestinian-authority-post-war-governance",
+      "target": "hamas-military-political-structure"
+    },
+    {
+      "id": "palestinian-authority-post-war-governance->israel-gaza-war-objectives",
+      "source": "palestinian-authority-post-war-governance",
+      "target": "israel-gaza-war-objectives"
+    },
+    {
+      "id": "palestinian-authority-post-war-governance->us-diplomatic-involvement-gaza",
+      "source": "palestinian-authority-post-war-governance",
+      "target": "us-diplomatic-involvement-gaza"
+    },
+    {
+      "id": "palestinian-authority-post-war-governance->gaza-ceasefire-hostage-negotiations",
+      "source": "palestinian-authority-post-war-governance",
+      "target": "gaza-ceasefire-hostage-negotiations"
+    },
+    {
+      "id": "unscr-1701-disarmament-framework->israel-lebanon-border-conflict",
+      "source": "unscr-1701-disarmament-framework",
+      "target": "israel-lebanon-border-conflict"
+    },
+    {
+      "id": "unscr-1701-disarmament-framework->hezbollah-military-arsenal-posture",
+      "source": "unscr-1701-disarmament-framework",
+      "target": "hezbollah-military-arsenal-posture"
+    },
+    {
+      "id": "unscr-1701-disarmament-framework->israel-northern-border-security-doctrine",
+      "source": "unscr-1701-disarmament-framework",
+      "target": "israel-northern-border-security-doctrine"
+    },
+    {
+      "id": "unscr-1701-disarmament-framework->lebanese-government-armed-forces-posture",
+      "source": "unscr-1701-disarmament-framework",
+      "target": "lebanese-government-armed-forces-posture"
+    },
+    {
+      "id": "us-diplomatic-involvement-gaza->gaza-ceasefire-hostage-negotiations",
+      "source": "us-diplomatic-involvement-gaza",
+      "target": "gaza-ceasefire-hostage-negotiations"
+    },
+    {
+      "id": "us-diplomatic-involvement-gaza->israel-gaza-war-objectives",
+      "source": "us-diplomatic-involvement-gaza",
+      "target": "israel-gaza-war-objectives"
+    },
+    {
+      "id": "us-diplomatic-involvement-gaza->palestinian-authority-post-war-governance",
+      "source": "us-diplomatic-involvement-gaza",
+      "target": "palestinian-authority-post-war-governance"
+    },
+    {
+      "id": "us-export-controls-semiconductors->us-china-tariffs",
+      "source": "us-export-controls-semiconductors",
+      "target": "us-china-tariffs"
+    },
+    {
+      "id": "us-fifth-fleet-maritime-security->strait-of-hormuz-maritime-tensions",
+      "source": "us-fifth-fleet-maritime-security",
+      "target": "strait-of-hormuz-maritime-tensions"
+    },
+    {
+      "id": "us-fifth-fleet-maritime-security->irgc-navy-gulf-posture",
+      "source": "us-fifth-fleet-maritime-security",
+      "target": "irgc-navy-gulf-posture"
+    },
+    {
+      "id": "us-fifth-fleet-maritime-security->hormuz-oil-transit-chokepoint",
+      "source": "us-fifth-fleet-maritime-security",
+      "target": "hormuz-oil-transit-chokepoint"
+    },
+    {
+      "id": "us-fifth-fleet-maritime-security->us-iran-diplomatic-deterrence-strategy",
+      "source": "us-fifth-fleet-maritime-security",
+      "target": "us-iran-diplomatic-deterrence-strategy"
+    },
+    {
+      "id": "us-france-lebanon-diplomatic-mediation->unscr-1701-disarmament-framework",
+      "source": "us-france-lebanon-diplomatic-mediation",
+      "target": "unscr-1701-disarmament-framework"
+    },
+    {
+      "id": "us-france-lebanon-diplomatic-mediation->israel-lebanon-border-conflict",
+      "source": "us-france-lebanon-diplomatic-mediation",
+      "target": "israel-lebanon-border-conflict"
+    },
+    {
+      "id": "us-france-lebanon-diplomatic-mediation->lebanese-government-armed-forces-posture",
+      "source": "us-france-lebanon-diplomatic-mediation",
+      "target": "lebanese-government-armed-forces-posture"
+    },
+    {
+      "id": "us-iran-diplomatic-deterrence-strategy->us-fifth-fleet-maritime-security",
+      "source": "us-iran-diplomatic-deterrence-strategy",
+      "target": "us-fifth-fleet-maritime-security"
+    },
+    {
+      "id": "us-iran-diplomatic-deterrence-strategy->iran-nuclear-enrichment-sanctions",
+      "source": "us-iran-diplomatic-deterrence-strategy",
+      "target": "iran-nuclear-enrichment-sanctions"
+    },
+    {
+      "id": "us-iran-diplomatic-deterrence-strategy->strait-of-hormuz-maritime-tensions",
+      "source": "us-iran-diplomatic-deterrence-strategy",
+      "target": "strait-of-hormuz-maritime-tensions"
+    },
+    {
+      "id": "us-iran-diplomatic-deterrence-strategy->gulf-states-iran-diplomatic-posture",
+      "source": "us-iran-diplomatic-deterrence-strategy",
+      "target": "gulf-states-iran-diplomatic-posture"
+    },
+    {
+      "id": "us-taiwan-relations-deterrence->taiwan-strait-military-tensions",
+      "source": "us-taiwan-relations-deterrence",
+      "target": "taiwan-strait-military-tensions"
+    },
+    {
+      "id": "us-taiwan-relations-deterrence->taiwan-armed-forces-defense-posture",
+      "source": "us-taiwan-relations-deterrence",
+      "target": "taiwan-armed-forces-defense-posture"
+    },
+    {
+      "id": "us-taiwan-relations-deterrence->china-taiwan-reunification-policy",
+      "source": "us-taiwan-relations-deterrence",
+      "target": "china-taiwan-reunification-policy"
+    },
+    {
+      "id": "us-taiwan-relations-deterrence->indo-pacific-taiwan-regional-alignment",
+      "source": "us-taiwan-relations-deterrence",
+      "target": "indo-pacific-taiwan-regional-alignment"
+    }
+  ],
+  "errors": []
+}
