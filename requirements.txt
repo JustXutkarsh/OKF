@@ -11,6 +11,7 @@ annotated-types==0.8.0
 anyio==4.14.2
     # via
     #   httpx
+    #   httpx2
     #   openai
     #   starlette
     #   watchfiles
@@ -32,26 +33,31 @@ fastapi==0.141.1
 h11==0.16.0
     # via
     #   httpcore
+    #   httpcore2
     #   uvicorn
 httpcore==1.0.9
     # via httpx
+httpcore2==2.10.0
+    # via httpx2
 httptools==0.8.0
     # via uvicorn
 httpx==0.28.1
     # via
     #   -r requirements.in
-    #   openai
     #   tavily-python
+httpx2==2.10.0
+    # via openai
 idna==3.18
     # via
     #   anyio
     #   httpx
+    #   httpx2
     #   requests
 jiter==0.16.0
     # via openai
 limits==5.8.0
     # via slowapi
-openai==2.53.0
+openai==3.0.0
     # via -r requirements.in
 packaging==26.3
     # via limits
@@ -88,10 +94,15 @@ tiktoken==0.13.0
     # via tavily-python
 tqdm==4.70.0
     # via openai
+truststore==0.10.4
+    # via
+    #   httpcore2
+    #   httpx2
 typing-extensions==4.16.0
     # via
     #   anyio
     #   fastapi
+    #   httpx2
     #   limits
     #   openai
     #   pydantic
@@ -104,7 +115,7 @@ typing-inspection==0.4.2
     #   pydantic
 urllib3==2.7.0
     # via requests
-uvicorn[standard]==0.52.1
+uvicorn[standard]==0.52.3
     # via -r requirements.in
 uvloop==0.22.1
     # via uvicorn
