@@ -40,10 +40,19 @@ def make_settings(**overrides) -> APISettings:
 
 @contextlib.contextmanager
 def api_client(settings: APISettings | None = None):
-    app = create_app(settings or make_settings())
-    # raise_server_exceptions=False: error ENVELOPES (not client-side raises)
-    with TestClient(app, raise_server_exceptions=False) as client:
-        yield client, app
+    with mock.patch.dict(
+        "os.environ",
+        {
+            "GROQ_API_KEY": "gsk-test-key",
+            "OPENAI_API_KEY": "sk-test-key",
+            "TAVILY_API_KEY": "tvly-test-key",
+        },
+        clear=False,
+    ):
+        app = create_app(settings or make_settings())
+        # raise_server_exceptions=False: error ENVELOPES (not client-side raises)
+        with TestClient(app, raise_server_exceptions=False) as client:
+            yield client, app
 
 
 class FakeBrief:
