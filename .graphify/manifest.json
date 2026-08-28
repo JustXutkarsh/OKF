@@ -1,0 +1,58 @@
+{
+  "name": "OKF Codebase & Intelligence Graph",
+  "version": "1.0.0",
+  "generated_at": "2026-08-28T19:25:00.973466+00:00",
+  "files": {
+    "graph_json": "graph.json",
+    "graph_html": "graph.html",
+    "report_md": "GRAPH_REPORT.md"
+  },
+  "stats": {
+    "nodes_count": 974,
+    "edges_count": 1490,
+    "layers": {
+      "producer": 89,
+      "validator": 41,
+      "backend": 21,
+      "consumer_a": 80,
+      "tests": 352,
+      "api": 145,
+      "consumer_b": 91,
+      "knowledge_bundle": 42,
+      "frontend": 113
+    },
+    "kinds": {
+      "module": 165,
+      "function": 210,
+      "class": 150,
+      "method": 114,
+      "test": 229,
+      "endpoint": 12,
+      "bundle": 1,
+      "concept": 41,
+      "component": 52
+    }
+  },
+  "entry_points": [
+    {
+      "name": "FastAPI Gateway",
+      "node_id": "py:mod:api.main"
+    },
+    {
+      "name": "Briefing Consumer A",
+      "node_id": "py:mod:consumer_a.service"
+    },
+    {
+      "name": "Critic Consumer B",
+      "node_id": "py:mod:consumer_b.service"
+    },
+    {
+      "name": "OKF Catalog",
+      "node_id": "bundle:okf_catalog"
+    },
+    {
+      "name": "Frontend Dashboard",
+      "node_id": "ts:mod:frontend/app/page.tsx"
+    }
+  ]
+}

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OKF Codebase & Intelligence Graph (.graphify)</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    :root {
+      --bg: #090d13;
+      --card: #111827;
+      --border: #1f293d;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --green: #10b981;
+      --cyan: #06b6d4;
+      --amber: #f59e0b;
+      --purple: #8b5cf6;
+      --rose: #f43f5e;
+      --blue: #3b82f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "JetBrains Mono", monospace;
+      background-color: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+    #sidebar {
+      width: 380px;
+      height: 100vh;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+    }
+    #header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      margin-bottom: 6px;
+    }
+    h1 { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
+    .subtitle { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    #controls {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 12px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .search-input:focus { border-color: var(--cyan); }
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .filter-chip {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+    .filter-chip.active {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: var(--cyan);
+      color: #fff;
+    }
+    #inspector {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+    .inspector-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; word-break: break-all; }
+    .meta-row { display: flex; justify-content: space-between; margin: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; }
+    .meta-label { color: var(--muted); font-size: 11px; }
+    .meta-val { font-weight: 600; font-family: monospace; }
+    .connections-list { margin-top: 14px; }
+    .conn-item { padding: 6px 8px; border-radius: 4px; background: rgba(0,0,0,0.3); margin-bottom: 4px; font-size: 11px; cursor: pointer; border: 1px solid transparent; }
+    .conn-item:hover { border-color: var(--cyan); background: rgba(6, 182, 212, 0.1); }
+    #viewport { flex: 1; height: 100vh; position: relative; }
+    svg { width: 100%; height: 100%; }
+    .stats-overlay {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 11px;
+      display: flex;
+      gap: 16px;
+      z-index: 5;
+    }
+    .stat-box { text-align: center; }
+    .stat-num { font-size: 15px; font-weight: 700; color: var(--cyan); }
+    .stat-lbl { color: var(--muted); font-size: 9px; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <div id="header">
+      <div class="badge">OKF .GRAPHIFY v1.0</div>
+      <h1>Codebase & Intelligence Graph</h1>
+      <p class="subtitle">Interactive AST, API, & Knowledge Network</p>
+    </div>
+    <div id="controls">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search nodes, functions, endpoints, concepts...">
+      <div>
+        <span style="font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; display: block; margin-bottom: 6px;">Filter Layer</span>
+        <div class="filter-group" id="layerFilters"></div>
+      </div>
+    </div>
+    <div id="inspector">
+      <p style="color: var(--muted); text-align: center; margin-top: 40px;">Click any node to inspect definitions, inbound calls, and relationships.</p>
+    </div>
+  </div>
+
+  <div id="viewport">
+    <div class="stats-overlay">
+      <div class="stat-box"><div class="stat-num" id="statNodes">0</div><div class="stat-lbl">Nodes</div></div>
+      <div class="stat-box"><div class="stat-num" id="statEdges">0</div><div class="stat-lbl">Edges</div></div>
+      <div class="stat-box"><div class="stat-num" id="statConcepts">41</div><div class="stat-lbl">Concepts</div></div>
+      <div class="stat-box"><div class="stat-num" id="statEndpoints">8</div><div class="stat-lbl">Endpoints</div></div>
+    </div>
+    <svg id="graphSvg"></svg>
+  </div>
+
+  <script>
+    const data = __GRAPH_DATA_PLACEHOLDER__;
+
+    document.getElementById("statNodes").innerText = data.stats.nodes_count;
+    document.getElementById("statEdges").innerText = data.stats.edges_count;
+
+    const layerColors = {
+      "backend": "#3b82f6",
+      "consumer_a": "#10b981",
+      "consumer_b": "#f59e0b",
+      "api": "#06b6d4",
+      "knowledge_bundle": "#8b5cf6",
+      "frontend": "#ec4899",
+      "tests": "#64748b",
+      "producer": "#14b8a6",
+      "validator": "#eab308",
+      "config": "#a855f7",
+      "infra": "#6b7280"
+    };
+
+    // Setup filter chips
+    const layers = Object.keys(data.stats.layers);
+    let activeLayers = new Set(layers);
+    const filterContainer = document.getElementById("layerFilters");
+    layers.forEach(layer => {
+      const chip = document.createElement("div");
+      chip.className = "filter-chip active";
+      chip.innerText = layer;
+      chip.style.borderColor = layerColors[layer] || "#475569";
+      chip.onclick = () => {
+        if (activeLayers.has(layer)) {
+          activeLayers.delete(layer);
+          chip.classList.remove("active");
+        } else {
+          activeLayers.add(layer);
+          chip.classList.add("active");
+        }
+        updateGraph();
+      };
+      filterContainer.appendChild(chip);
+    });
+
+    const svg = d3.select("#graphSvg");
+    const width = window.innerWidth - 380;
+    const height = window.innerHeight;
+    svg.attr("viewBox", [0, 0, width, height]);
+
+    const g = svg.append("g");
+
+    const zoom = d3.zoom()
+      .scaleExtent([0.1, 4])
+      .on("zoom", (event) => g.attr("transform", event.transform));
+    svg.call(zoom);
+
+    let simulation = d3.forceSimulation()
+      .force("link", d3.forceLink().id(d => d.id).distance(60))
+      .force("charge", d3.forceManyBody().strength(-120))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("collide", d3.forceCollide().radius(18));
+
+    let link = g.append("g").attr("class", "links").selectAll("line");
+    let node = g.append("g").attr("class", "nodes").selectAll("circle");
+    let label = g.append("g").attr("class", "labels").selectAll("text");
+
+    function updateGraph() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+
+      const filteredNodes = data.nodes.filter(n => {
+        const inLayer = activeLayers.has(n.layer);
+        const matchesQuery = !query || n.label.toLowerCase().includes(query) || n.id.toLowerCase().includes(query) || (n.summary && n.summary.toLowerCase().includes(query));
+        return inLayer && matchesQuery;
+      });
+
+      const nodeSet = new Set(filteredNodes.map(n => n.id));
+      const filteredEdges = data.edges.filter(e => {
+        const src = typeof e.source === 'object' ? e.source.id : e.source;
+        const tgt = typeof e.target === 'object' ? e.target.id : e.target;
+        return nodeSet.has(src) && nodeSet.has(tgt);
+      });
+
+      link = link.data(filteredEdges, d => (d.source.id || d.source) + "->" + (d.target.id || d.target))
+        .join("line")
+        .attr("stroke", "#1e293b")
+        .attr("stroke-opacity", 0.6)
+        .attr("stroke-width", d => Math.sqrt(d.weight || 1));
+
+      node = node.data(filteredNodes, d => d.id)
+        .join("circle")
+        .attr("r", d => Math.max(5, Math.min(18, 5 + (d.total_degree || 0))))
+        .attr("fill", d => layerColors[d.layer] || "#94a3b8")
+        .attr("stroke", "#0f172a")
+        .attr("stroke-width", 1.5)
+        .style("cursor", "pointer")
+        .call(d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended))
+        .on("click", (event, d) => inspectNode(d));
+
+      label = label.data(filteredNodes, d => d.id)
+        .join("text")
+        .text(d => d.label)
+        .attr("font-size", d => d.kind === "endpoint" || d.kind === "component" || d.kind === "bundle" ? 10 : 8)
+        .attr("font-family", "monospace")
+        .attr("fill", "#cbd5e1")
+        .attr("dx", 10)
+        .attr("dy", 3)
+        .style("pointer-events", "none")
+        .style("opacity", d => (d.total_degree > 3 || d.kind === "endpoint" || d.kind === "component") ? 1 : 0.4);
+
+      simulation.nodes(filteredNodes).on("tick", ticked);
+      simulation.force("link").links(filteredEdges);
+      simulation.alpha(0.6).restart();
+    }
+
+    function ticked() {
+      link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+      node
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y);
+
+      label
+        .attr("x", d => d.x)
+        .attr("y", d => d.y);
+    }
+
+    function dragstarted(event) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      event.subject.fx = event.subject.x;
+      event.subject.fy = event.subject.y;
+    }
+
+    function dragged(event) {
+      event.subject.fx = event.x;
+      event.subject.fy = event.y;
+    }
+
+    function dragended(event) {
+      if (!event.active) simulation.alphaTarget(0);
+      event.subject.fx = null;
+      event.subject.fy = null;
+    }
+
+    function inspectNode(d) {
+      const inspector = document.getElementById("inspector");
+      const inbound = data.edges.filter(e => (e.target.id || e.target) === d.id);
+      const outbound = data.edges.filter(e => (e.source.id || e.source) === d.id);
+
+      const color = layerColors[d.layer] || "#94a3b8";
+      let html = '<div class="badge" style="background: ' + color + '22; color: ' + color + ';">' + d.layer + ' · ' + d.kind + '</div>';
+      html += '<h2 class="inspector-title">' + d.label + '</h2>';
+      html += '<p style="color: var(--muted); margin: 6px 0 12px 0; font-size: 11px;">' + (d.summary || 'No summary available.') + '</p>';
+
+      html += '<div class="meta-row"><span class="meta-label">File</span><span class="meta-val">' + d.file + ':' + d.line + '</span></div>';
+      html += '<div class="meta-row"><span class="meta-label">Node ID</span><span class="meta-val" style="font-size: 10px;">' + d.id + '</span></div>';
+      html += '<div class="meta-row"><span class="meta-label">Degree (In/Out)</span><span class="meta-val">' + d.in_degree + ' in / ' + d.out_degree + ' out</span></div>';
+
+      html += '<div class="connections-list">';
+      html += '<span style="font-size: 11px; font-weight: 700; color: #fff; display: block; margin-bottom: 6px;">Inbound Connections (' + inbound.length + ')</span>';
+      inbound.slice(0, 10).forEach(e => {
+        const srcId = e.source.id || e.source;
+        const srcNode = data.nodes.find(n => n.id === srcId);
+        const name = srcNode ? srcNode.label : srcId;
+        html += '<div class="conn-item" onclick="selectNodeById(\\'' + srcId + '\\')">← [' + e.kind + '] ' + name + '</div>';
+      });
+      html += '</div>';
+
+      html += '<div class="connections-list" style="margin-top: 12px;">';
+      html += '<span style="font-size: 11px; font-weight: 700; color: #fff; display: block; margin-bottom: 6px;">Outbound Connections (' + outbound.length + ')</span>';
+      outbound.slice(0, 10).forEach(e => {
+        const tgtId = e.target.id || e.target;
+        const tgtNode = data.nodes.find(n => n.id === tgtId);
+        const name = tgtNode ? tgtNode.label : tgtId;
+        html += '<div class="conn-item" onclick="selectNodeById(\\'' + tgtId + '\\')">→ [' + e.kind + '] ' + name + '</div>';
+      });
+      html += '</div>';
+
+      inspector.innerHTML = html;
+    }
+
+    window.selectNodeById = function(id) {
+      const target = data.nodes.find(n => n.id === id);
+      if (target) {
+        inspectNode(target);
+      }
+    };
+
+    document.getElementById("searchInput").addEventListener("input", updateGraph);
+    updateGraph();
+  </script>
+</body>
+</html>
