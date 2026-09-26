@@ -14,6 +14,8 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { Network } from "lucide-react";
 import type { KnowledgeGraph } from "@/lib/knowledge-graph";
+import bundleGraphData from "@/lib/bundle-graph.json";
+import { loadConfig } from "@/lib/config";
 
 // Node type color coding for the command center graph
 const TYPE_COLORS: Record<string, string> = {
@@ -133,25 +135,54 @@ export function KnowledgeGraphPanel({
   const query = useQuery({
     queryKey: ["knowledge-graph"],
     queryFn: async (): Promise<KnowledgeGraph> => {
-      const res = await fetch("/api/graph", { cache: "no-store" });
-      return res.json();
+      // 1. Try local Next.js /api/graph endpoint
+      try {
+        const res = await fetch("/api/graph", { cache: "no-store" });
+        if (res.ok) {
+          const data = (await res.json()) as KnowledgeGraph;
+          if (data?.nodes && data.nodes.length > 0) return data;
+        }
+      } catch {
+        // Fall through
+      }
+
+      // 2. Try configured production backend /api/v1/graph (e.g. Render)
+      try {
+        const { baseUrl } = loadConfig();
+        const res = await fetch(`${baseUrl}/api/v1/graph`, { cache: "no-store" });
+        if (res.ok) {
+          const data = (await res.json()) as KnowledgeGraph;
+          if (data?.nodes && data.nodes.length > 0) return data;
+        }
+      } catch {
+        // Fall through
+      }
+
+      // 3. Guaranteed client-side bundle graph fallback
+      return bundleGraphData as KnowledgeGraph;
     },
     staleTime: 30_000,
   });
 
   const retrievedSet = useMemo(() => new Set(retrievedDocumentIds), [retrievedDocumentIds]);
 
+  const activeGraph = useMemo(() => {
+    if (query.data?.nodes && query.data.nodes.length > 0) {
+      return query.data;
+    }
+    return bundleGraphData as KnowledgeGraph;
+  }, [query.data]);
+
   const { nodes, edges } = useMemo(() => {
-    if (!query.data) return { nodes: [] as Node[], edges: [] as Edge[] };
-    return layoutGraph(query.data, isDark, retrievedSet);
-  }, [query.data, isDark, retrievedSet]);
+    return layoutGraph(activeGraph, isDark, retrievedSet);
+  }, [activeGraph, isDark, retrievedSet]);
 
   // Type legend
-  const typeSet = new Set(query.data?.nodes?.map((n) => n.type) ?? []);
+  const typeSet = new Set(activeGraph.nodes.map((n) => n.type));
   const legendTypes = [...typeSet].slice(0, 5);
 
-  const nodeCount = query.data?.nodes?.length ?? 0;
-  const edgeCount = query.data?.edges?.length ?? 0;
+  const nodeCount = activeGraph.nodes.length;
+  const edgeCount = activeGraph.edges.length;
   const activeRetrievedCount = retrievedDocumentIds.length;
 
   return (
@@ -168,23 +199,21 @@ export function KnowledgeGraphPanel({
         <p className="flex-1 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
           INTELLIGENCE NETWORK
         </p>
-        {query.data && (
-          <div className="flex items-center gap-2 font-mono text-[9px]">
-            {activeRetrievedCount > 0 && (
-              <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-emerald-400 border border-emerald-500/30">
-                {activeRetrievedCount} IN MISSION
-              </span>
-            )}
-            <span className="text-muted-foreground/60">
-              {nodeCount} NODES · {edgeCount} EDGES
+        <div className="flex items-center gap-2 font-mono text-[9px]">
+          {activeRetrievedCount > 0 && (
+            <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-emerald-400 border border-emerald-500/30">
+              {activeRetrievedCount} IN MISSION
             </span>
-          </div>
-        )}
+          )}
+          <span className="text-muted-foreground/60">
+            {nodeCount} NODES · {edgeCount} EDGES
+          </span>
+        </div>
       </div>
 
       {/* Graph */}
       <div className="min-h-0 flex-1 relative">
-        {query.isPending && (
+        {query.isPending && !query.data && (
           <div className="flex h-full items-center justify-center">
             <motion.p
               animate={{ opacity: [0.4, 0.9, 0.4] }}
@@ -195,25 +224,17 @@ export function KnowledgeGraphPanel({
             </motion.p>
           </div>
         )}
-        {query.isError && (
-          <div className="flex h-full items-center justify-center p-4 text-center">
-            <p className="font-mono text-[10px] text-muted-foreground/40">
-              BUNDLE MAP UNAVAILABLE
-            </p>
-          </div>
-        )}
-        {query.data && (
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            fitView
-            nodesDraggable
-            nodesConnectable={false}
-            zoomOnScroll
-            panOnScroll
-            proOptions={PRO_OPTIONS}
-            style={{ backgroundColor: "transparent" }}
-          >
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          fitView
+          nodesDraggable
+          nodesConnectable={false}
+          zoomOnScroll
+          panOnScroll
+          proOptions={PRO_OPTIONS}
+          style={{ backgroundColor: "transparent" }}
+        >
             <Background
               variant={BackgroundVariant.Dots}
               gap={20}
@@ -222,7 +243,6 @@ export function KnowledgeGraphPanel({
             />
             <Controls showInteractive={false} />
           </ReactFlow>
-        )}
       </div>
 
       {/* Type legend */}
