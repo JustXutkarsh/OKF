@@ -8,8 +8,6 @@ import ReactFlow, {
   Controls,
   type Edge,
   type Node,
-  useEdgesState,
-  useNodesState,
   MarkerType,
   BackgroundVariant,
 } from "reactflow";
@@ -114,8 +112,11 @@ function layoutGraph(
   return { nodes, edges };
 }
 
+const EMPTY_IDS: string[] = [];
+const PRO_OPTIONS = { hideAttribution: true };
+
 export function KnowledgeGraphPanel({
-  retrievedDocumentIds = [],
+  retrievedDocumentIds = EMPTY_IDS,
 }: {
   retrievedDocumentIds?: string[];
 }) {
@@ -141,16 +142,9 @@ export function KnowledgeGraphPanel({
   const retrievedSet = useMemo(() => new Set(retrievedDocumentIds), [retrievedDocumentIds]);
 
   const { nodes, edges } = useMemo(() => {
-    if (!query.data) return { nodes: [], edges: [] };
+    if (!query.data) return { nodes: [] as Node[], edges: [] as Edge[] };
     return layoutGraph(query.data, isDark, retrievedSet);
   }, [query.data, isDark, retrievedSet]);
-
-  const [rfNodes, setNodes] = useNodesState([]);
-  const [rfEdges, setEdges] = useEdgesState([]);
-  useEffect(() => {
-    setNodes(nodes);
-    setEdges(edges);
-  }, [nodes, edges, setNodes, setEdges]);
 
   // Type legend
   const typeSet = new Set(query.data?.nodes?.map((n) => n.type) ?? []);
@@ -210,14 +204,14 @@ export function KnowledgeGraphPanel({
         )}
         {query.data && (
           <ReactFlow
-            nodes={rfNodes}
-            edges={rfEdges}
+            nodes={nodes}
+            edges={edges}
             fitView
             nodesDraggable
             nodesConnectable={false}
             zoomOnScroll
             panOnScroll
-            proOptions={{ hideAttribution: true }}
+            proOptions={PRO_OPTIONS}
             style={{ backgroundColor: "transparent" }}
           >
             <Background
